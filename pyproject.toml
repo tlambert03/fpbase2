@@ -19,6 +19,7 @@ uvicorn = { version = "^0.18.2", extras = ["standard"] }
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1"
+pytest-cov = "^3.0.0"
 flake8 = "^5.0.4"
 mypy = "^0.971"
 isort = "^5.10.1"
@@ -28,7 +29,7 @@ flake8-pyprojecttoml = { git = "https://github.com/tlambert03/flake8-pyprojectto
 ipython = "^8.4.0"
 
 [tool.poetry.scripts]
-serve = "fpbase2.main:serve"
+serve = "fpbase2._dev:serve"
 
 [tool.flake8]
 max-line-length = 88

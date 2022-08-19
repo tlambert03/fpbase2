@@ -58,9 +58,3 @@ def update_protein(
 def delete_protein(*, session: Session = Depends(get_session), protein_id: int) -> dict:
     """Delete a protein by ID."""
     return delete_object(session, Protein, protein_id)
-
-
-def serve() -> None:
-    from uvicorn import run
-
-    run("fpbase2.main:app", reload=True, debug=True)
