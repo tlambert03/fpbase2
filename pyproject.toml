@@ -75,6 +75,7 @@ module = [
 ]
 ignore_missing_imports = true
 
+
 # https://coverage.readthedocs.io/en/6.4/config.html
 [tool.coverage.report]
 exclude_lines = [

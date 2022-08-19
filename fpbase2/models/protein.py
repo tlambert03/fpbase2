@@ -3,20 +3,21 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any
 
-from sqlmodel import Field, Session, SQLModel
+from sqlmodel import JSON, Column, Field, Session, SQLModel
 
 from ..utils.text import slugify
 
 UNIQUE: Any = {"sa_column_kwargs": {"unique": True}}
+LIST_COLUMN: Any = {"sa_column": Column(JSON)}
 
 
-class RecordStatus(Enum):
+class RecordStatus(str, Enum):
     PENDING = "pending"
     APPROVED = "approved"
     HIDDEN = "hidden"
 
 
-class OligomerizationTendency(Enum):
+class OligomerizationTendency(str, Enum):
     MONOMER = "m"
     DIMER = "d"
     TANDEM_DIMER = "td"
@@ -26,17 +27,9 @@ class OligomerizationTendency(Enum):
 
 class _ProteinBase(SQLModel):
     name: str = Field(index=True, max_length=128)
-    # aliases: list[str] = []
-    # agg: OligomerizationTendency | None = None
+    aliases: list[str] = Field(default_factory=list, **LIST_COLUMN)
+    agg: OligomerizationTendency | None = None
     sequence: str | None = None
-
-
-class Protein(_ProteinBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    slug: str | None = Field(default=None, **UNIQUE)
-
-    def before_flush(self, session: Session, flush_context: Any) -> None:
-        self.slug = slugify(self.name)
 
 
 class ProteinCreate(_ProteinBase):
@@ -50,3 +43,18 @@ class ProteinRead(_ProteinBase):
 
 class ProteinUpdate(SQLModel):
     name: str | None = None
+
+
+class Protein(_ProteinBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    slug: str | None = Field(default=None, **UNIQUE)
+
+    def before_flush(self, session: Session, flush_context: Any) -> None:
+        self.slug = slugify(self.name)
+
+        if self in session.dirty:
+            # updating
+            ...
+        if self in session.new:
+            # inserting
+            ...

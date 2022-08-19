@@ -7,18 +7,24 @@ from fpbase2.utils import read_or_404
 
 
 def test_create_protein(client: TestClient):
-    response = client.post("/proteins/", json={"name": "EGFP"})
+    response = client.post(
+        "/proteins/",
+        json={"name": "EGFP", "sequence": "ABCDE", "aliases": ["OG"], "agg": "m"},
+    )
     assert response.status_code == 200
     data = response.json()
     assert data["name"] == "EGFP"
     assert data["id"] is not None
     assert data["slug"] == "egfp"
+    assert data["sequence"] == "ABCDE"
+    assert data["aliases"] == ["OG"]
+    assert data["agg"] == "m"
 
 
-# def test_create_protein_incomplete(client: TestClient):
-#     # No secret_name
-#     response = client.post("/proteins/", json={"name": "Deadpond"})
-#     assert response.status_code == 422
+def test_create_protein_incomplete(client: TestClient):
+    # No name
+    response = client.post("/proteins/", json={"sequence": "ABCDE"})
+    assert response.status_code == 422
 
 
 def test_create_protein_invalid(client: TestClient):
@@ -32,7 +38,7 @@ def test_create_protein_invalid(client: TestClient):
 # TODO
 @pytest.mark.filterwarnings("ignore:Class SelectOfScalar will not make use of SQL")
 def test_read_proteins(session: Session, client: TestClient):
-    egfp = Protein(name="EGFP", sequence="ABCDE")
+    egfp = Protein(name="EGFP", sequence="ABCDE", aliases=["OG"], agg="td")
     assert not egfp.id
     mcherry = Protein(name="mCherry", sequence="FGHIJ")
     session.add(egfp)
@@ -49,6 +55,8 @@ def test_read_proteins(session: Session, client: TestClient):
     assert data[0]["sequence"] == egfp.sequence
     assert data[0]["id"] == egfp.id
     assert data[0]["slug"] == egfp.slug == "egfp"
+    assert data[0]["aliases"] == egfp.aliases == ["OG"]
+    assert data[0]["agg"] == egfp.agg == "td"
     assert data[1]["name"] == mcherry.name
     assert data[1]["sequence"] == mcherry.sequence
     assert data[1]["id"] == mcherry.id
