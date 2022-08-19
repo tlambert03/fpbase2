@@ -1,0 +1,29 @@
+name: Tests
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  tests:
+    name: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install -U pip
+          pip install poetry<2
+
+      - uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: "1.1.14"
+
+      - name: Test
+        run: poetry run tests
