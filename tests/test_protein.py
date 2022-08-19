@@ -1,8 +1,9 @@
+import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
+
 from fpbase2.models.protein import Protein
 from fpbase2.utils import read_or_404
-import pytest
 
 
 def test_create_protein(client: TestClient):

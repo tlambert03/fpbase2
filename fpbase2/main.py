@@ -2,8 +2,9 @@ from fastapi import Depends, FastAPI, Query
 from sqlmodel import Session, select
 
 from fpbase2.db import create_db_and_tables, get_session
-from fpbase2.models.protein import Protein, ProteinRead, ProteinCreate, ProteinUpdate
-from .utils import delete_object, read_or_404, update_object, create_object
+from fpbase2.models.protein import Protein, ProteinCreate, ProteinRead, ProteinUpdate
+
+from .utils import create_object, delete_object, read_or_404, update_object
 
 app = FastAPI()
 
@@ -15,7 +16,7 @@ class URL:
 
 
 @app.on_event("startup")
-def on_startup():
+def on_startup() -> None:
     create_db_and_tables()
 
 

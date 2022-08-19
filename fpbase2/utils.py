@@ -1,7 +1,8 @@
-from sqlmodel import SQLModel, Session
+from typing import Any, TypeVar
+
 from fastapi import HTTPException
-from typing import TypeVar
 from pydantic import BaseModel
+from sqlmodel import Session, SQLModel
 
 M = TypeVar("M", bound=SQLModel)
 
@@ -30,7 +31,7 @@ def create_object(session: Session, model: type[M], data: BaseModel) -> M:
     return db_obj
 
 
-def read_or_404(session: Session, model: type[M], id: int, **kwargs) -> M:
+def read_or_404(session: Session, model: type[M], id: int, **kwargs: Any) -> M:
     """Read an object from the database or raise a 404 if it doesn't exist.
 
     Parameters
@@ -58,7 +59,7 @@ def read_or_404(session: Session, model: type[M], id: int, **kwargs) -> M:
 
 
 def update_object(
-    session: Session, model: type[M], id: int, update_data: BaseModel, **kwargs
+    session: Session, model: type[M], id: int, update_data: BaseModel, **kwargs: Any
 ) -> M:
     """Update an object in the database.
 
@@ -94,7 +95,7 @@ def update_object(
     return db_obj
 
 
-def delete_object(session: Session, model: type[M], id: int, **kwargs) -> dict:
+def delete_object(session: Session, model: type[M], id: int, **kwargs: Any) -> dict:
     """Delete an object from the database.
 
     Parameters

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from sqlmodel import SQLModel, Field
 from enum import Enum
+from typing import Any
 
-UNIQUE: dict[str, dict[str, bool]] = {"sa_column_kwargs": {"unique": True}}
+from sqlmodel import Field, SQLModel
+
+UNIQUE: Any = {"sa_column_kwargs": {"unique": True}}
 
 
 class RecordStatus(Enum):
@@ -25,6 +27,7 @@ class ProteinBase(SQLModel):
     # aliases: list[str] = []
     # agg: OligomerizationTendency | None = None
     sequence: str | None = None
+
 
 class Protein(ProteinBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
