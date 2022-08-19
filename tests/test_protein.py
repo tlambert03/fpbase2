@@ -1,4 +1,8 @@
 from fastapi.testclient import TestClient
+from sqlmodel import Session
+from fpbase2.models.protein import Protein
+from fpbase2.utils import read_or_404
+import pytest
 
 
 def test_create_protein(client: TestClient):
@@ -17,80 +21,74 @@ def test_create_protein(client: TestClient):
 #     assert response.status_code == 422
 
 
-# def test_create_protein_invalid(client: TestClient):
-#     # secret_name has an invalid type
-#     response = client.post(
-#         "/proteins/",
-#         json={
-#             "name": "Deadpond",
-#             "secret_name": {"message": "Do you wanna know my secret identity?"},
-#         },
-#     )
-#     assert response.status_code == 422
+def test_create_protein_invalid(client: TestClient):
+    # secret_name has an invalid type
+    response = client.post(
+        "/proteins/", json={"name": "EGFP", "sequence": {"message": "ALMMALASDFKSD"}}
+    )
+    assert response.status_code == 422
 
 
-# def test_read_heroes(session: Session, client: TestClient):
-#     hero_1 = Hero(name="Deadpond", secret_name="Dive Wilson")
-#     hero_2 = Hero(name="Rusty-Man", secret_name="Tommy Sharp", age=48)
-#     session.add(hero_1)
-#     session.add(hero_2)
-#     session.commit()
+# TODO
+@pytest.mark.filterwarnings("ignore:Class SelectOfScalar will not make use of SQL")
+def test_read_proteins(session: Session, client: TestClient):
+    egfp = Protein(name="EGFP", sequence="ABCDE")
+    assert not egfp.id
+    mcherry = Protein(name="mCherry", sequence="FGHIJ")
+    session.add(egfp)
+    session.add(mcherry)
+    session.commit()
+    assert egfp.id
 
-#     response = client.get("/proteins/")
-#     data = response.json()
+    response = client.get("/proteins/")
+    assert response.status_code == 200
+    data = response.json()
 
-#     assert response.status_code == 200
-
-#     assert len(data) == 2
-#     assert data[0]["name"] == hero_1.name
-#     assert data[0]["secret_name"] == hero_1.secret_name
-#     assert data[0]["age"] == hero_1.age
-#     assert data[0]["id"] == hero_1.id
-#     assert data[1]["name"] == hero_2.name
-#     assert data[1]["secret_name"] == hero_2.secret_name
-#     assert data[1]["age"] == hero_2.age
-#     assert data[1]["id"] == hero_2.id
-
-
-# def test_read_hero(session: Session, client: TestClient):
-#     hero_1 = Hero(name="Deadpond", secret_name="Dive Wilson")
-#     session.add(hero_1)
-#     session.commit()
-
-#     response = client.get(f"/proteins/{hero_1.id}")
-#     data = response.json()
-
-#     assert response.status_code == 200
-#     assert data["name"] == hero_1.name
-#     assert data["secret_name"] == hero_1.secret_name
-#     assert data["age"] == hero_1.age
-#     assert data["id"] == hero_1.id
+    assert len(data) == 2
+    assert data[0]["name"] == egfp.name
+    assert data[0]["sequence"] == egfp.sequence
+    assert data[0]["id"] == egfp.id
+    assert data[1]["name"] == mcherry.name
+    assert data[1]["sequence"] == mcherry.sequence
+    assert data[1]["id"] == mcherry.id
 
 
-# def test_update_hero(session: Session, client: TestClient):
-#     hero_1 = Hero(name="Deadpond", secret_name="Dive Wilson")
-#     session.add(hero_1)
-#     session.commit()
+def test_read_protein(session: Session, client: TestClient):
+    egfp = Protein(name="EGFP", sequence="ABCDE")
+    session.add(egfp)
+    session.commit()
 
-#     response = client.patch(f"/proteins/{hero_1.id}", json={"name": "Deadpuddle"})
-#     data = response.json()
+    response = client.get(f"/proteins/{egfp.id}")
+    data = response.json()
 
-#     assert response.status_code == 200
-#     assert data["name"] == "Deadpuddle"
-#     assert data["secret_name"] == "Dive Wilson"
-#     assert data["age"] is None
-#     assert data["id"] == hero_1.id
+    assert response.status_code == 200
+    assert data["name"] == egfp.name
+    assert data["sequence"] == egfp.sequence
+    assert data["id"] == egfp.id
 
 
-# def test_delete_hero(session: Session, client: TestClient):
-#     hero_1 = Hero(name="Deadpond", secret_name="Dive Wilson")
-#     session.add(hero_1)
-#     session.commit()
+def test_update_protein(session: Session, client: TestClient):
+    egfp = Protein(name="EGFP", sequence="ABCDE")
+    session.add(egfp)
+    session.commit()
 
-#     response = client.delete(f"/proteins/{hero_1.id}")
+    response = client.patch(f"/proteins/{egfp.id}", json={"name": "mEGFP"})
+    data = response.json()
 
-#     hero_in_db = session.get(Hero, hero_1.id)
+    assert response.status_code == 200
+    assert data["name"] == "mEGFP"
+    assert data["sequence"] == egfp.sequence
+    assert data["id"] == egfp.id
 
-#     assert response.status_code == 200
 
-#     assert hero_in_db is None
+def test_delete_protein(session: Session, client: TestClient):
+    egfp = Protein(name="EGFP", sequence="ABCDE")
+    session.add(egfp)
+    session.commit()
+
+    response = client.delete(f"/proteins/{egfp.id}")
+    assert response.status_code == 200
+
+    assert session.get(Protein, egfp.id) is None
+    with pytest.raises(Exception):
+        assert read_or_404(session, Protein, egfp.id)

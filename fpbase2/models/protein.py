@@ -24,7 +24,7 @@ class ProteinBase(SQLModel):
     name: str = Field(index=True, max_length=128)
     # aliases: list[str] = []
     # agg: OligomerizationTendency | None = None
-
+    sequence: str | None = None
 
 class Protein(ProteinBase, table=True):
     id: int | None = Field(default=None, primary_key=True)

@@ -9,8 +9,14 @@ from fpbase2.main import app, get_session
 @pytest.fixture
 def session():
     """Create a database engine for testing, and connect a session to it."""
-    connect_args = {"check_same_thread": False}
-    engine = create_engine("sqlite://", connect_args=connect_args, poolclass=StaticPool)
+    # create in-memory database with "sqlite://"
+    # we need to also tell SQLAlchemy that we want to be able to use the same
+    # in-memory database object from different threads.
+    # We tell it that with the poolclass=StaticPool parameter.
+    # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#using-a-memory-database-in-multiple-threads
+    engine = create_engine(
+        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
+    )
     SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
         yield session
