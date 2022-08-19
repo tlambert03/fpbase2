@@ -1,0 +1,37 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "fpbase2"
+version = "0.1.0"
+description = ""
+authors = ["Talley Lambert <talley.lambert@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "~3.10"
+fastapi = "~0.79"
+requests = "^2.28.1"
+sqlalchemy = "1.4.35"
+sqlmodel = "~0.0.6"
+strawberry-graphql = "^0.125.1"
+uvicorn = { version = "^0.18.2", extras = ["standard"] }
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1"
+flake8 = "^5.0.4"
+mypy = "^0.971"
+isort = "^5.10.1"
+black = "^22.6.0"
+pdbpp = "^0.10.3"
+flake8-pyprojecttoml = { git = "https://github.com/tlambert03/flake8-pyprojecttoml.git", rev = "main" }
+ipython = "^8.4.0"
+
+[tool.poetry.scripts]
+serve = "fpbase2.main:serve"
+
+[tool.flake8]
+max-line-length = 88
+
+[tool.isort]
+profile = 'black'
