@@ -28,6 +28,7 @@ pdbpp = "^0.10.3"
 flake8-pyprojecttoml = { git = "https://github.com/tlambert03/flake8-pyprojecttoml.git", rev = "main" }
 ipython = "^8.4.0"
 pre-commit = "^2.20.0"
+pydantic-factories = "^1.5.4"
 
 [tool.poetry.scripts]
 serve = "fpbase2._dev:serve"

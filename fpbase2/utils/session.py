@@ -31,7 +31,7 @@ def create_object(session: Session, model: type[M], data: BaseModel) -> M:
     return db_obj
 
 
-def read_or_404(session: Session, model: type[M], id: int, **kwargs: Any) -> M:
+def read_or_404(session: Session, model: type[M], ident: Any, **kwargs: Any) -> M:
     """Read an object from the database or raise a 404 if it doesn't exist.
 
     Parameters
@@ -40,8 +40,8 @@ def read_or_404(session: Session, model: type[M], id: int, **kwargs: Any) -> M:
         The database session.
     model : type[SQLModel]
         The model to get.
-    id : int
-        The ID of the object to get.
+    ident : Any
+        The identifier of the object to get.
 
     Returns
     -------
@@ -53,13 +53,13 @@ def read_or_404(session: Session, model: type[M], id: int, **kwargs: Any) -> M:
     HTTPException
         If the object doesn't exist.
     """
-    if obj := session.get(model, id, **kwargs):
+    if obj := session.get(model, ident, **kwargs):
         return obj
     raise HTTPException(status_code=404, detail=f"{model.__name__} not found")
 
 
 def update_object(
-    session: Session, model: type[M], id: int, update_data: BaseModel, **kwargs: Any
+    session: Session, model: type[M], ident: Any, update_data: BaseModel, **kwargs: Any
 ) -> M:
     """Update an object in the database.
 
@@ -69,8 +69,8 @@ def update_object(
         The database session.
     model : type[SQLModel]
         The model to update.
-    id : int
-        The ID of the object to update.
+    ident : Any
+        The identifier of the object to get.
     update_data : BaseModel
         The data to update the object with.
 
@@ -84,7 +84,7 @@ def update_object(
     HTTPException
         If the object doesn't exist.
     """
-    db_obj = read_or_404(session, model, id, **kwargs)
+    db_obj = read_or_404(session, model, ident, **kwargs)
 
     for key, value in update_data.dict(exclude_unset=True).items():
         setattr(db_obj, key, value)
@@ -95,7 +95,7 @@ def update_object(
     return db_obj
 
 
-def delete_object(session: Session, model: type[M], id: int, **kwargs: Any) -> dict:
+def delete_object(session: Session, model: type[M], ident: Any, **kwargs: Any) -> dict:
     """Delete an object from the database.
 
     Parameters
@@ -104,8 +104,8 @@ def delete_object(session: Session, model: type[M], id: int, **kwargs: Any) -> d
         The database session.
     model : type[SQLModel]
         The model to delete.
-    id : int
-        The ID of the object to delete.
+    ident : Any
+        The identifier of the object to get.
 
     Returns
     -------
@@ -117,7 +117,7 @@ def delete_object(session: Session, model: type[M], id: int, **kwargs: Any) -> d
     HTTPException
         If the object doesn't exist.
     """
-    db_obj = read_or_404(session, model, id, **kwargs)
+    db_obj = read_or_404(session, model, ident, **kwargs)
     session.delete(db_obj)
     session.commit()
     return {"ok": True}

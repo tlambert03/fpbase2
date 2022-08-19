@@ -3,7 +3,8 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
-from fpbase2.main import app, get_session
+from fpbase2.db import _bind_listeners, get_session
+from fpbase2.main import app
 
 
 @pytest.fixture
@@ -19,6 +20,7 @@ def session():
     )
     SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
+        _bind_listeners(session)
         yield session
 
 

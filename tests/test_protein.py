@@ -12,8 +12,7 @@ def test_create_protein(client: TestClient):
     data = response.json()
     assert data["name"] == "EGFP"
     assert data["id"] is not None
-    # assert data["aliases"] == []
-    # assert data["slug"] is not None
+    assert data["slug"] == "egfp"
 
 
 # def test_create_protein_incomplete(client: TestClient):
@@ -49,9 +48,11 @@ def test_read_proteins(session: Session, client: TestClient):
     assert data[0]["name"] == egfp.name
     assert data[0]["sequence"] == egfp.sequence
     assert data[0]["id"] == egfp.id
+    assert data[0]["slug"] == egfp.slug == "egfp"
     assert data[1]["name"] == mcherry.name
     assert data[1]["sequence"] == mcherry.sequence
     assert data[1]["id"] == mcherry.id
+    assert data[1]["slug"] == mcherry.slug == "mcherry"
 
 
 def test_read_protein(session: Session, client: TestClient):
@@ -66,12 +67,15 @@ def test_read_protein(session: Session, client: TestClient):
     assert data["name"] == egfp.name
     assert data["sequence"] == egfp.sequence
     assert data["id"] == egfp.id
+    assert data["slug"] == egfp.slug
 
 
 def test_update_protein(session: Session, client: TestClient):
     egfp = Protein(name="EGFP", sequence="ABCDE")
     session.add(egfp)
     session.commit()
+
+    assert egfp.slug == "egfp"
 
     response = client.patch(f"/proteins/{egfp.id}", json={"name": "mEGFP"})
     data = response.json()
@@ -80,6 +84,7 @@ def test_update_protein(session: Session, client: TestClient):
     assert data["name"] == "mEGFP"
     assert data["sequence"] == egfp.sequence
     assert data["id"] == egfp.id
+    assert data["slug"] == egfp.slug == "megfp"
 
 
 def test_delete_protein(session: Session, client: TestClient):
