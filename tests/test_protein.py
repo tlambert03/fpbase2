@@ -15,6 +15,8 @@ def test_create_protein(client: TestClient):
     data = response.json()
     assert data["name"] == "EGFP"
     assert data["id"] is not None
+    assert data["uuid"] is not None
+    assert len(data["uuid"]) == 5
     assert data["slug"] == "egfp"
     assert data["seq"] == "ABCDE"
     assert data["aliases"] == ["OG"]
@@ -79,13 +81,18 @@ def test_read_protein(session: Session, client: TestClient):
 
 
 def test_update_protein(session: Session, client: TestClient):
-    egfp = Protein(name="EGFP", seq="ABCDE")
+    egfp = Protein(name="EGFP", seq="ABCDE", aliases=["OG"], agg="td")
     session.add(egfp)
     session.commit()
 
     assert egfp.slug == "egfp"
+    assert egfp.agg == "td"
+    assert egfp.aliases == ["OG"]
 
-    response = client.patch(f"/proteins/{egfp.id}", json={"name": "mEGFP"})
+    response = client.patch(
+        f"/proteins/{egfp.id}",
+        json={"name": "mEGFP", "aliases": ["OG", "mistaGFP"], "agg": "m"},
+    )
     data = response.json()
 
     assert response.status_code == 200
@@ -93,6 +100,8 @@ def test_update_protein(session: Session, client: TestClient):
     assert data["seq"] == egfp.seq
     assert data["id"] == egfp.id
     assert data["slug"] == egfp.slug == "megfp"
+    assert data["aliases"] == ["OG", "mistaGFP"]
+    assert data["agg"] == "m"
 
 
 def test_delete_protein(session: Session, client: TestClient):
