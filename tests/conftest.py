@@ -1,9 +1,11 @@
+import sys
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
-from fpbase2.db import _bind_listeners, get_session
+from fpbase2.db import get_session
 from fpbase2.main import app
 
 
@@ -16,11 +18,13 @@ def session():
     # We tell it that with the poolclass=StaticPool parameter.
     # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#using-a-memory-database-in-multiple-threads
     engine = create_engine(
-        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+        echo="-v" in sys.argv,
     )
     SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
-        _bind_listeners(session)
         yield session
 
 

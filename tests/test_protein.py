@@ -9,28 +9,28 @@ from fpbase2.utils import read_or_404
 def test_create_protein(client: TestClient):
     response = client.post(
         "/proteins/",
-        json={"name": "EGFP", "sequence": "ABCDE", "aliases": ["OG"], "agg": "m"},
+        json={"name": "EGFP", "seq": "ABCDE", "aliases": ["OG"], "agg": "m"},
     )
     assert response.status_code == 200
     data = response.json()
     assert data["name"] == "EGFP"
     assert data["id"] is not None
     assert data["slug"] == "egfp"
-    assert data["sequence"] == "ABCDE"
+    assert data["seq"] == "ABCDE"
     assert data["aliases"] == ["OG"]
     assert data["agg"] == "m"
 
 
 def test_create_protein_incomplete(client: TestClient):
     # No name
-    response = client.post("/proteins/", json={"sequence": "ABCDE"})
+    response = client.post("/proteins/", json={"seq": "ABCDE"})
     assert response.status_code == 422
 
 
 def test_create_protein_invalid(client: TestClient):
     # secret_name has an invalid type
     response = client.post(
-        "/proteins/", json={"name": "EGFP", "sequence": {"message": "ALMMALASDFKSD"}}
+        "/proteins/", json={"name": "EGFP", "seq": {"message": "ALMMALASDFKSD"}}
     )
     assert response.status_code == 422
 
@@ -38,9 +38,9 @@ def test_create_protein_invalid(client: TestClient):
 # TODO
 @pytest.mark.filterwarnings("ignore:Class SelectOfScalar will not make use of SQL")
 def test_read_proteins(session: Session, client: TestClient):
-    egfp = Protein(name="EGFP", sequence="ABCDE", aliases=["OG"], agg="td")
+    egfp = Protein(name="EGFP", seq="ABCDE", aliases=["OG"], agg="td")
     assert not egfp.id
-    mcherry = Protein(name="mCherry", sequence="FGHIJ")
+    mcherry = Protein(name="mCherry", seq="FGHIJ")
     session.add(egfp)
     session.add(mcherry)
     session.commit()
@@ -52,19 +52,19 @@ def test_read_proteins(session: Session, client: TestClient):
 
     assert len(data) == 2
     assert data[0]["name"] == egfp.name
-    assert data[0]["sequence"] == egfp.sequence
+    assert data[0]["seq"] == egfp.seq
     assert data[0]["id"] == egfp.id
     assert data[0]["slug"] == egfp.slug == "egfp"
     assert data[0]["aliases"] == egfp.aliases == ["OG"]
     assert data[0]["agg"] == egfp.agg == "td"
     assert data[1]["name"] == mcherry.name
-    assert data[1]["sequence"] == mcherry.sequence
+    assert data[1]["seq"] == mcherry.seq
     assert data[1]["id"] == mcherry.id
     assert data[1]["slug"] == mcherry.slug == "mcherry"
 
 
 def test_read_protein(session: Session, client: TestClient):
-    egfp = Protein(name="EGFP", sequence="ABCDE")
+    egfp = Protein(name="EGFP", seq="ABCDE")
     session.add(egfp)
     session.commit()
 
@@ -73,13 +73,13 @@ def test_read_protein(session: Session, client: TestClient):
 
     assert response.status_code == 200
     assert data["name"] == egfp.name
-    assert data["sequence"] == egfp.sequence
+    assert data["seq"] == egfp.seq
     assert data["id"] == egfp.id
     assert data["slug"] == egfp.slug
 
 
 def test_update_protein(session: Session, client: TestClient):
-    egfp = Protein(name="EGFP", sequence="ABCDE")
+    egfp = Protein(name="EGFP", seq="ABCDE")
     session.add(egfp)
     session.commit()
 
@@ -90,13 +90,13 @@ def test_update_protein(session: Session, client: TestClient):
 
     assert response.status_code == 200
     assert data["name"] == "mEGFP"
-    assert data["sequence"] == egfp.sequence
+    assert data["seq"] == egfp.seq
     assert data["id"] == egfp.id
     assert data["slug"] == egfp.slug == "megfp"
 
 
 def test_delete_protein(session: Session, client: TestClient):
-    egfp = Protein(name="EGFP", sequence="ABCDE")
+    egfp = Protein(name="EGFP", seq="ABCDE")
     session.add(egfp)
     session.commit()
 

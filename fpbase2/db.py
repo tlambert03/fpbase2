@@ -1,20 +1,16 @@
 from __future__ import annotations
 
 import os
-from itertools import chain
-from typing import TYPE_CHECKING, Any, Iterator
+from typing import Iterator
 
-from sqlalchemy import event
-from sqlmodel import Session, SQLModel, create_engine
-
-if TYPE_CHECKING:
-    from sqlalchemy.orm.unitofwork import UOWTransaction
-
+from sqlalchemy import orm
+from sqlmodel import SQLModel, create_engine
 
 DEFAULT_DB_URL = "sqlite:///database.db"
 DATABASE_URL = os.environ.get("DATABASE_URL", DEFAULT_DB_URL)
 connect_args = {"check_same_thread": False}
 engine = create_engine(DATABASE_URL, echo=True, connect_args=connect_args)
+Session = orm.sessionmaker(bind=engine)
 
 
 def create_db_and_tables() -> None:
@@ -25,16 +21,6 @@ def create_db_and_tables() -> None:
     SQLModel.metadata.create_all(engine)
 
 
-def _bind_listeners(session: Session) -> None:
-    @event.listens_for(session, "before_flush")  # type: ignore
-    def _before_flush(session: Session, context: UOWTransaction, _: Any) -> None:
-        "listen for the 'before_flush' event"
-        for obj in chain(session.new, session.dirty):
-            if method := getattr(obj, "before_flush", None):
-                method(session, context)
-
-
-def get_session() -> Iterator[Session]:
-    with Session(engine) as session:
-        _bind_listeners(session)
+def get_session() -> Iterator[orm.Session]:
+    with Session() as session:
         yield session
