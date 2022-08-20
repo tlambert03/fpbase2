@@ -27,7 +27,7 @@ def new_id(
     while (i := i + 1) < 100:
         if (_uuid := "".join(choices(opts, k=k))) not in existing:
             return _uuid
-    raise RuntimeError("Could not generate unique uuid after 100 tries")
+    raise RuntimeError("Could not generate unique uuid.")  # pragma: no cover
 
 
 class RecordStatus(str, Enum):

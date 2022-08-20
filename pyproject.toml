@@ -59,6 +59,7 @@ profile = 'black'
 # https://docs.pytest.org/en/6.2.x/customize.html
 [tool.pytest.ini_options]
 minversion = "6.0"
+addopts = ["--cov=fpbase2", "--cov-report=term-missing"]
 testpaths = ["tests"]
 filterwarnings = ["error"]
 
