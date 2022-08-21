@@ -36,10 +36,11 @@ def recreate() -> None:
 
     from fpbase2.db import create_db_and_tables
 
-    Path(__file__).parent.parent.parent.joinpath("database.db").unlink()
+    Path(__file__).parent.parent.parent.joinpath("database.db").unlink(missing_ok=True)
     create_db_and_tables()
-    from fpbase2._dev._import import add_fpb_proteins, add_fpb_users
+    from fpbase2._dev._import import add_fpb_proteins, add_fpb_references, add_fpb_users
 
     add_fpb_users(10)
+    add_fpb_references(500)
     add_fpb_proteins(500)
     shell()

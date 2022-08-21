@@ -6,6 +6,7 @@ from sqlmodel import Session, SQLModel, create_engine, text
 
 from fpbase2 import db
 from fpbase2.models.protein import Protein
+from fpbase2.models.reference import Reference
 from fpbase2.models.user import User
 
 load_dotenv()
@@ -17,6 +18,7 @@ M = TypeVar("M", bound=SQLModel)
 QUERIES: dict[type[SQLModel], str] = {
     User: "SELECT * FROM users_user ORDER BY date_joined LIMIT :limit",
     Protein: "SELECT * FROM proteins_protein ORDER BY created LIMIT :limit",
+    Reference: "SELECT * FROM references_reference ORDER BY created LIMIT :limit",
 }
 
 
@@ -26,32 +28,22 @@ def iter_fpb_table(Model: type[M], n: int = 10) -> Iterator[M]:
             yield Model(**row)
 
 
-def add_fpb_objects(model: str, n: int = 10) -> None:
+def add_fpb_objects(model: type[M], n: int = 10) -> None:
     objects: list[SQLModel]
-    if model == "protein":
-        objects = list(iter_fpb_proteins(n))
-    elif model == "user":
-        objects = list(iter_fpb_users(n))
-    else:
-        raise ValueError(f"Unknown model: {model}")
-
+    objects = list(iter_fpb_table(model, n))
     with Session(db.engine) as session:
         for obj in objects:
             session.add(obj)
         session.commit()
 
 
-def iter_fpb_proteins(n: int = 10) -> Iterator[Protein]:
-    return iter_fpb_table(Protein, n)
-
-
-def iter_fpb_users(n: int = 10) -> Iterator[User]:
-    return iter_fpb_table(User, n)
-
-
 def add_fpb_proteins(n: int = 10) -> None:
-    add_fpb_objects("protein", n)
+    add_fpb_objects(Protein, n)
 
 
 def add_fpb_users(n: int = 10) -> None:
-    add_fpb_objects("user", n)
+    add_fpb_objects(User, n)
+
+
+def add_fpb_references(n: int = 10) -> None:
+    add_fpb_objects(Reference, n)

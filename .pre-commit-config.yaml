@@ -51,5 +51,6 @@ repos:
       - id: mypy
         files: "^fpbase2/"
         additional_dependencies:
-          - "fastapi"
-          - "sqlmodel"
+          - fastapi
+          - sqlmodel
+          - types-requests

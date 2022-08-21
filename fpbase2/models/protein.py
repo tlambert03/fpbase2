@@ -9,11 +9,11 @@ from .._typed_sa import on_before_save
 from ..utils.text import new_id, slugify
 from ..validators import UNIPROT_REGEX
 from .mixins import Authorable, QueryMixin, TimestampModel
+from .reference import Reference
 from .user import User
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import Connection
-
 
 UNIQUE: Any = {"sa_column_kwargs": {"unique": True}}
 
@@ -65,6 +65,15 @@ class ProteinBase(Authorable, TimestampModel):
     uniprot: str | None = Field(None, max_length=10, regex=UNIPROT_REGEX, **UNIQUE)
     ipg_id: str | None = Field(None, max_length=12, **UNIQUE)
 
+    primary_reference_id: int | None = Field(default=None, foreign_key="reference.id")
+    # oser
+    # parent_organism_id
+    # default_state_id
+    # mw
+    # base_name
+    # status
+    # status_changed
+
 
 class ProteinCreate(ProteinBase):
     pass
@@ -93,6 +102,7 @@ class Protein(ProteinBase, QueryMixin, table=True):
     updated_by: User | None = Relationship(
         sa_relationship_kwargs={"primaryjoin": "User.id==Protein.updated_by_id"}
     )
+    primary_reference: Reference | None = Relationship(back_populates="proteins")
 
     @on_before_save
     def _on_before_save(self, _: Any, conn: Connection) -> None:
