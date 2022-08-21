@@ -1,6 +1,7 @@
 import re
 import unicodedata
-from typing import Any
+from random import choices
+from typing import Any, Container, Sequence
 
 
 def slugify(value: Any, allow_unicode: bool = False) -> str:
@@ -20,3 +21,16 @@ def slugify(value: Any, allow_unicode: bool = False) -> str:
         v = unicodedata.normalize("NFKD", v).encode("ascii", "ignore").decode("ascii")
     v = re.sub(r"[^\w\s-]", "", v).strip().lower()
     return re.sub(r"[-\s]+", "-", v)
+
+
+def new_id(
+    k: int = 5,
+    opts: Sequence[str] = "ABCDEFGHJKLMNOPQRSTUVWXYZ123456789",
+    existing: Container[str] = (),
+) -> str:
+    # in sqlite, this could be: `substr(hex(randomblob(3)), 1, 6)`
+    i = 0
+    while (i := i + 1) < 100:
+        if (_uuid := "".join(choices(opts, k=k))) not in existing:
+            return _uuid
+    raise RuntimeError("Could not generate unique uuid.")  # pragma: no cover

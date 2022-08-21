@@ -32,3 +32,8 @@ class TimestampModel(SQLModel):
             "onupdate": text("current_timestamp"),
         },
     )
+
+
+class Authorable(SQLModel):
+    created_by_id: int | None = Field(default=None, foreign_key="user.id")
+    updated_by_id: int | None = Field(default=None, foreign_key="user.id")

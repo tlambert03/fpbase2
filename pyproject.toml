@@ -16,6 +16,7 @@ sqlalchemy = "1.4.35"
 sqlmodel = "^0.0.6"
 strawberry-graphql = "^0.125.1"
 uvicorn = { version = "^0.18.2", extras = ["standard"] }
+python-dotenv = "^0.20.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1"
@@ -29,11 +30,14 @@ flake8-pyprojecttoml = { git = "https://github.com/tlambert03/flake8-pyprojectto
 ipython = "^8.4.0"
 pre-commit = "^2.20.0"
 pydantic-factories = "^1.5.4"
-psycopg2 = {extras = ["binary"], version = "^2.9.3"}
+psycopg2 = { extras = ["binary"], version = "^2.9.3" }
 rich = "^12.5.1"
 
 [tool.poetry.scripts]
-serve = "fpbase2._dev:serve"
+dev = "fpbase2._dev:serve"
+sp = "fpbase2._dev:shell"
+lint = "pre_commit run --all-files"
+
 
 # https://flake8.pycqa.org/en/latest/user/options.html
 # https://gitlab.com/durko/flake8-pyprojecttoml
@@ -73,9 +77,7 @@ show_error_codes = true
 pretty = true
 
 [[tool.mypy.overrides]]
-module = [
-    "uvicorn",
-]
+module = ["uvicorn", "IPython"]
 ignore_missing_imports = true
 
 

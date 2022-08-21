@@ -1,4 +1,6 @@
 from fastapi import Depends, FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.routing import APIRoute
 from sqlmodel import Session, select
 
 from fpbase2.db import create_db_and_tables, get_session
@@ -6,7 +8,19 @@ from fpbase2.models.protein import Protein, ProteinCreate, ProteinRead, ProteinU
 
 from .utils import create_object, delete_object, read_or_404, update_object
 
-app = FastAPI()
+
+def custom_generate_unique_id(route: APIRoute) -> str:
+    tag = route.tags[0] if route.tags else route.name.split("/")[0]
+    return f"{tag}-{route.name}"
+
+
+app = FastAPI(generate_unique_id_function=custom_generate_unique_id)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class URL:
@@ -28,7 +42,7 @@ def create_protein(
     return create_object(session, Protein, protein)
 
 
-@app.get(URL.PROTEINS, response_model=list[Protein])
+@app.get(URL.PROTEINS, response_model=list[ProteinRead])
 def read_proteins(
     *,
     session: Session = Depends(get_session),

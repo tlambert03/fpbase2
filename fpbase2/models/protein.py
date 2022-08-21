@@ -1,33 +1,21 @@
 from __future__ import annotations
 
 from enum import Enum
-from random import choices
-from typing import TYPE_CHECKING, Any, Container, Sequence
+from typing import TYPE_CHECKING, Any
 
-from sqlmodel import JSON, Column, Field, text
+from sqlmodel import JSON, Column, Field, Relationship, text
 
 from .._typed_sa import on_before_save
-from ..utils.text import slugify
+from ..utils.text import new_id, slugify
 from ..validators import UNIPROT_REGEX
-from .mixins import TimestampModel
+from .mixins import Authorable, TimestampModel
+from .user import User
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import Connection
 
 
 UNIQUE: Any = {"sa_column_kwargs": {"unique": True}}
-
-
-def new_id(
-    k: int = 5,
-    opts: Sequence[str] = "ABCDEFGHJKLMNOPQRSTUVWXYZ123456789",
-    existing: Container[str] = (),
-) -> str:
-    i = 0
-    while (i := i + 1) < 100:
-        if (_uuid := "".join(choices(opts, k=k))) not in existing:
-            return _uuid
-    raise RuntimeError("Could not generate unique uuid.")  # pragma: no cover
 
 
 class RecordStatus(str, Enum):
@@ -61,7 +49,7 @@ class SwitchingType(str, Enum):
     OTHER = "o"
 
 
-class ProteinBase(TimestampModel):
+class ProteinBase(Authorable, TimestampModel):
     name: str = Field(index=True, max_length=128)
     aliases: list[str] = Field(default_factory=list, sa_column=Column(JSON))
     agg: OligomerizationTendency | None = None
@@ -76,6 +64,9 @@ class ProteinBase(TimestampModel):
     genbank: str | None = Field(None, max_length=12, **UNIQUE)
     uniprot: str | None = Field(None, max_length=10, regex=UNIPROT_REGEX, **UNIQUE)
     ipg_id: str | None = Field(None, max_length=12, **UNIQUE)
+
+    created_by: User | None = Relationship(back_populates="proteins")
+    updated_by: User | None = Relationship(back_populates="proteins")
 
 
 class ProteinCreate(ProteinBase):
