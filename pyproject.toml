@@ -54,6 +54,7 @@ D100  # missing docstring in public module
 D401  # imperative mood
 W503  # line break before binary operator
 B008  # function calls in argument defaults
+E731  # do not assign to lambda
 """
 per-file-ignores = ["tests/*:D"]
 

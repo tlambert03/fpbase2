@@ -15,9 +15,10 @@ def shell() -> None:
         "from sqlmodel import *",
         "from fpbase2.models.protein import *",
         "from fpbase2.db import *",
+        "from fpbase2._dev import *",
         "from rich import print",
         "from rich import pretty; pretty.install()",
-        "session = next(get_session())",
+        "session = Session(engine)",
         "create_db_and_tables()",
     ]
 

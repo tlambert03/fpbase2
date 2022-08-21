@@ -1,10 +1,14 @@
 import uuid as uuid_pkg
 from datetime import datetime
+from typing import TypeVar
 
 from sqlalchemy import text
 from sqlmodel import Field
 
 from .._vendored import SQLModel
+from ._query import QueryManager
+
+M = TypeVar("M", bound=SQLModel)
 
 
 class UUIDModel(SQLModel):
@@ -37,3 +41,10 @@ class TimestampModel(SQLModel):
 class Authorable(SQLModel):
     created_by_id: int | None = Field(default=None, foreign_key="user.id")
     updated_by_id: int | None = Field(default=None, foreign_key="user.id")
+
+
+class QueryMixin(SQLModel):
+    @classmethod
+    @property
+    def q(cls: type[M]) -> QueryManager[M]:
+        return QueryManager(cls)

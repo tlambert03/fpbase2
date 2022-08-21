@@ -8,7 +8,7 @@ from sqlmodel import JSON, Column, Field, Relationship, text
 from .._typed_sa import on_before_save
 from ..utils.text import new_id, slugify
 from ..validators import UNIPROT_REGEX
-from .mixins import Authorable, TimestampModel
+from .mixins import QueryMixin, TimestampModel
 from .user import User
 
 if TYPE_CHECKING:
@@ -49,7 +49,7 @@ class SwitchingType(str, Enum):
     OTHER = "o"
 
 
-class ProteinBase(Authorable, TimestampModel):
+class ProteinBase(TimestampModel):
     name: str = Field(index=True, max_length=128)
     aliases: list[str] = Field(default_factory=list, sa_column=Column(JSON))
     agg: OligomerizationTendency | None = None
@@ -65,6 +65,8 @@ class ProteinBase(Authorable, TimestampModel):
     uniprot: str | None = Field(None, max_length=10, regex=UNIPROT_REGEX, **UNIQUE)
     ipg_id: str | None = Field(None, max_length=12, **UNIQUE)
 
+    created_by_id: int | None = Field(default=None, foreign_key="user.id")
+    updated_by_id: int | None = Field(default=None, foreign_key="user.id")
     created_by: User | None = Relationship(back_populates="proteins")
     updated_by: User | None = Relationship(back_populates="proteins")
 
@@ -84,7 +86,7 @@ class ProteinUpdate(ProteinBase):
     seq_validated: bool = False
 
 
-class Protein(ProteinBase, table=True):
+class Protein(ProteinBase, QueryMixin, table=True):
     id: int | None = Field(default=None, primary_key=True)
     # TODO: allow_mutation = False
     uuid: str | None = Field(default=None, index=True, max_length=5, **UNIQUE)
