@@ -16,6 +16,8 @@ def shell() -> None:
         "from fpbase2.models.protein import *",
         "from fpbase2.db import *",
         "from fpbase2._dev import *",
+        "from fpbase2._dev._import import *",
+        "from fpbase2._dev._factories import *",
         "from rich import print",
         "from rich import pretty; pretty.install()",
         "session = Session(engine)",
@@ -26,3 +28,18 @@ def shell() -> None:
     c.InteractiveShell.confirm_exit = False
     c.TerminalIPythonApp.display_banner = False
     IPython.start_ipython(config=c)
+
+
+def recreate() -> None:
+    """Recreate the database and tables."""
+    from pathlib import Path
+
+    from fpbase2.db import create_db_and_tables
+
+    Path(__file__).parent.parent.parent.joinpath("database.db").unlink()
+    create_db_and_tables()
+    from fpbase2._dev._import import add_fpb_proteins, add_fpb_users
+
+    add_fpb_users(10)
+    add_fpb_proteins(500)
+    shell()

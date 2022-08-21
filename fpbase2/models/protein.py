@@ -8,7 +8,7 @@ from sqlmodel import JSON, Column, Field, Relationship, text
 from .._typed_sa import on_before_save
 from ..utils.text import new_id, slugify
 from ..validators import UNIPROT_REGEX
-from .mixins import QueryMixin, TimestampModel
+from .mixins import Authorable, QueryMixin, TimestampModel
 from .user import User
 
 if TYPE_CHECKING:
@@ -49,9 +49,9 @@ class SwitchingType(str, Enum):
     OTHER = "o"
 
 
-class ProteinBase(TimestampModel):
+class ProteinBase(Authorable, TimestampModel):
     name: str = Field(index=True, max_length=128)
-    aliases: list[str] = Field(default_factory=list, sa_column=Column(JSON))
+    aliases: list[str] | None = Field(None, sa_column=Column(JSON))
     agg: OligomerizationTendency | None = None
     seq: str | None = None
     seq_comment: str | None = Field(max_length=512)
@@ -60,15 +60,10 @@ class ProteinBase(TimestampModel):
     cofactor: FluorescenceCofactor | None = None
     switch_type: SwitchingType = SwitchingType.BASIC
     blurb: str | None = Field(max_length=512)
-    pdb: list[str] = Field(default_factory=list, sa_column=Column(JSON))
+    pdb: list[str] | None = Field(None, sa_column=Column(JSON))
     genbank: str | None = Field(None, max_length=12, **UNIQUE)
     uniprot: str | None = Field(None, max_length=10, regex=UNIPROT_REGEX, **UNIQUE)
     ipg_id: str | None = Field(None, max_length=12, **UNIQUE)
-
-    created_by_id: int | None = Field(default=None, foreign_key="user.id")
-    updated_by_id: int | None = Field(default=None, foreign_key="user.id")
-    created_by: User | None = Relationship(back_populates="proteins")
-    updated_by: User | None = Relationship(back_populates="proteins")
 
 
 class ProteinCreate(ProteinBase):
@@ -92,6 +87,12 @@ class Protein(ProteinBase, QueryMixin, table=True):
     uuid: str | None = Field(default=None, index=True, max_length=5, **UNIQUE)
     slug: str | None = Field(default=None, **UNIQUE)
     seq_validated: bool = False
+    created_by: User | None = Relationship(
+        sa_relationship_kwargs={"primaryjoin": "User.id==Protein.created_by_id"},
+    )
+    updated_by: User | None = Relationship(
+        sa_relationship_kwargs={"primaryjoin": "User.id==Protein.updated_by_id"}
+    )
 
     @on_before_save
     def _on_before_save(self, _: Any, conn: Connection) -> None:

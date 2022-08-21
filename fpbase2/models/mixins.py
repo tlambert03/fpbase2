@@ -1,3 +1,4 @@
+import os
 import uuid as uuid_pkg
 from datetime import datetime
 from typing import TypeVar
@@ -6,9 +7,7 @@ from sqlalchemy import text
 from sqlmodel import Field
 
 from .._vendored import SQLModel
-from ._query import QueryManager
-
-M = TypeVar("M", bound=SQLModel)
+from ..db._query import QueryManager
 
 
 class UUIDModel(SQLModel):
@@ -43,8 +42,17 @@ class Authorable(SQLModel):
     updated_by_id: int | None = Field(default=None, foreign_key="user.id")
 
 
+M = TypeVar("M", bound="QueryMixin")
+
+
 class QueryMixin(SQLModel):
+    _qm: QueryManager | None = None
+
     @classmethod
     @property
     def q(cls: type[M]) -> QueryManager[M]:
-        return QueryManager(cls)
+        if cls._qm is None:
+            if os.getenv("ALLOW_QM") != "1":
+                raise RuntimeError("QueryMixin is disabled, use ALLOW_QM=1 to enable")
+            cls._qm = QueryManager(cls)
+        return cls._qm

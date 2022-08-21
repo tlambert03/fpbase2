@@ -2,6 +2,8 @@ from datetime import datetime
 
 from sqlmodel import Field, SQLModel
 
+from fpbase2.models.mixins import QueryMixin
+
 
 class UserBase(SQLModel):
     # password: str
@@ -18,5 +20,5 @@ class UserBase(SQLModel):
     name: str | None = None
 
 
-class User(UserBase, table=True):
+class User(UserBase, QueryMixin, table=True):
     id: int | None = Field(default=None, primary_key=True)

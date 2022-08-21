@@ -1,24 +1,17 @@
 from __future__ import annotations
 
-import os
 from typing import Iterator
 
-from dotenv import load_dotenv
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, SQLModel
 
-load_dotenv()
+from ._engine import engine
 
-DEBUG = os.getenv("DEBUG", "0") != "0"
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///database.db")
-
-engine = create_engine(
-    DATABASE_URL, echo=DEBUG, connect_args={"check_same_thread": False}
-)
+__all__ = ["create_db_and_tables", "get_session", "engine"]
 
 
 def create_db_and_tables() -> None:
     # it's important to evaluate all SQLModels before creating the tables
-    from . import models  # noqa
+    from .. import models  # noqa
 
     # this is the line that creates the database.db file
     SQLModel.metadata.create_all(engine)
