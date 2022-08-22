@@ -8,7 +8,7 @@ from sqlmodel import JSON, Column, Field, Relationship, text
 from .._typed_sa import on_before_save
 from ..utils.text import new_id, slugify
 from ..validators import UNIPROT_REGEX
-from .mixins import Authorable, QueryMixin, TimestampModel
+from .mixins import Authorable, QueryMixin, TimeStampedModel
 from .reference import Reference
 from .user import User
 
@@ -49,7 +49,7 @@ class SwitchingType(str, Enum):
     OTHER = "o"
 
 
-class ProteinBase(Authorable, TimestampModel):
+class ProteinBase(Authorable, TimeStampedModel):
     name: str = Field(index=True, max_length=128)
     aliases: list[str] | None = Field(None, sa_column=Column(JSON))
     agg: OligomerizationTendency | None = None

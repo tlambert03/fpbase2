@@ -1,7 +1,6 @@
 import os
-import uuid as uuid_pkg
 from datetime import datetime
-from typing import TypeVar
+from typing import Any, Sequence, TypeVar
 
 from sqlalchemy import text
 from sqlmodel import Field
@@ -10,17 +9,7 @@ from .._vendored import SQLModel
 from ..db._query import QueryManager
 
 
-class UUIDModel(SQLModel):
-    uuid: uuid_pkg.UUID = Field(
-        default_factory=uuid_pkg.uuid4,
-        primary_key=True,
-        index=True,
-        nullable=False,
-        sa_column_kwargs={"server_default": text("gen_random_uuid()"), "unique": True},
-    )
-
-
-class TimestampModel(SQLModel):
+class TimeStampedModel(SQLModel):
     created: datetime = Field(
         default_factory=datetime.utcnow,
         nullable=False,
@@ -36,10 +25,18 @@ class TimestampModel(SQLModel):
         },
     )
 
+    def __repr_args__(self) -> Sequence[tuple[str | None, Any]]:
+        args = super().__repr_args__()
+        return [i for i in args if i[0] not in TimeStampedModel.__fields__]
+
 
 class Authorable(SQLModel):
     created_by_id: int | None = Field(default=None, foreign_key="user.id")
     updated_by_id: int | None = Field(default=None, foreign_key="user.id")
+
+    def __repr_args__(self) -> Sequence[tuple[str | None, Any]]:
+        args = super().__repr_args__()
+        return [i for i in args if i[0] not in Authorable.__dict__]
 
 
 M = TypeVar("M", bound="QueryMixin")

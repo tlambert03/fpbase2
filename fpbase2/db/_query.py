@@ -98,6 +98,16 @@ class QueryManager(Generic[M]):
     def random(self, n: int = 1) -> M | list[M]:
         return self._select(limit=n, order_by=func.random())
 
+    @overload
+    def where(  # type: ignore
+        self, expression: ColumnElement, limit: Literal[1] = 1
+    ) -> M:
+        ...
+
+    @overload
+    def where(self, expression: ColumnElement, limit: int | None = None) -> list[M]:
+        ...
+
     def where(self, expression: ColumnElement, limit: int | None = None) -> M | list[M]:
         return self._select(limit=limit, where=expression)
 

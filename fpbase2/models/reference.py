@@ -1,17 +1,61 @@
 from datetime import datetime
+from enum import Enum
 from typing import TYPE_CHECKING, Optional
 
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, Relationship, SQLModel, UniqueConstraint
 
 from ..validators import DOI_REGEX
-from .mixins import Authorable, QueryMixin, TimestampModel
+from .mixins import Authorable, QueryMixin, TimeStampedModel
 
 if TYPE_CHECKING:
     from .protein import Protein
 
 
-class ReferenceBase(Authorable, TimestampModel):
-    # TODO: fix server side regex
+class AuthorSequence(str, Enum):
+    FIRST = "first"
+    ADDITIONAL = "additional"
+
+
+class AuthorReferenceLink(QueryMixin, table=True):
+    author_id: int | None = Field(None, foreign_key="author.id", primary_key=True)
+    reference_id: int | None = Field(None, foreign_key="reference.id", primary_key=True)
+    author_idx: int = Field(ge=0)
+    author_squence: AuthorSequence | None = None
+
+    # author: "Author" = Relationship(back_populates="reference_links")
+    # reference: "Reference" = Relationship(back_populates="author_links")
+
+
+class AuthorBase(TimeStampedModel):
+    family: str | None = None
+    given: str | None = None
+    orcid: str | None = Field(None, sa_column_kwargs={"unique": True})
+
+
+class Author(AuthorBase, QueryMixin, table=True):
+    __table_args__ = (UniqueConstraint("family", "given", name="_family_given_uc"),)
+    id: int | None = Field(default=None, primary_key=True)
+
+    references: list["Reference"] = Relationship(
+        back_populates="authors", link_model=AuthorReferenceLink
+    )
+    # reference_links: list[AuthorReferenceLink] = Relationship(back_populates="author")
+
+
+class AuthorCreate(AuthorBase):
+    ...
+
+
+class AuthorUpdate(AuthorBase):
+    pass
+
+
+class AuthorRead(AuthorBase):
+    id: int
+
+
+class ReferenceBase(Authorable, TimeStampedModel):
+    # TODO: fix doi regex validation
     doi: str = Field(sa_column_kwargs={"unique": True})
     pmid: str | None = Field(None, max_length=50, sa_column_kwargs={"unique": True})
     title: str | None = Field(max_length=512)
@@ -30,15 +74,20 @@ class Reference(ReferenceBase, QueryMixin, table=True):
     id: int | None = Field(default=None, primary_key=True)
     proteins: Optional["Protein"] = Relationship(back_populates="primary_reference")
 
+    authors: list[Author] = Relationship(
+        back_populates="references", link_model=AuthorReferenceLink
+    )
+    # author_links: list[AuthorReferenceLink] = Relationship(back_populates="reference")
+
 
 class ReferenceCreate(SQLModel):
     doi: str = Field(..., regex=DOI_REGEX, sa_column_kwargs={"unique": True})
     pmid: str | None = Field(None, max_length=50)
 
 
-class ReferenceRead(ReferenceBase):
-    id: int
-
-
 class ReferenceUpdate(ReferenceCreate):
     pass
+
+
+class ReferenceRead(ReferenceBase):
+    id: int

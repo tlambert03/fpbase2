@@ -6,8 +6,9 @@ from sqlmodel import Session, SQLModel, create_engine, text
 
 from fpbase2 import db
 from fpbase2.models.protein import Protein
-from fpbase2.models.reference import Reference
+from fpbase2.models.reference import Author, AuthorReferenceLink, Reference
 from fpbase2.models.user import User
+from fpbase2.utils import crossref_work
 
 load_dotenv()
 
@@ -37,7 +38,7 @@ def add_fpb_objects(model: type[M], n: int = 10) -> None:
         session.commit()
 
 
-def add_fpb_proteins(n: int = 10) -> None:
+def add_fpb_proteins(n: int = 200) -> None:
     add_fpb_objects(Protein, n)
 
 
@@ -45,5 +46,36 @@ def add_fpb_users(n: int = 10) -> None:
     add_fpb_objects(User, n)
 
 
-def add_fpb_references(n: int = 10) -> None:
-    add_fpb_objects(Reference, n)
+def add_fpb_references(n: int = 50) -> None:
+    with Session(db.engine) as session:
+        # for every reference currently in FPbase
+        for db_ref in iter_fpb_table(Reference, n):
+            print("adding reference", db_ref.doi)
+            # look up the reference in CrossRef
+            work = crossref_work(db_ref.doi)
+            # for each author in the reference
+            _db_authors: list[tuple[Author, str]] = []
+            for author in work.author:
+                # create an fpbase2 author object
+                db_author = Author.q.where(  # type: ignore
+                    (Author.given == author.given) & (Author.family == author.family),
+                    limit=1,
+                )
+                if not db_author:
+                    db_author = Author.parse_obj(author)
+                    session.add(db_author)
+                _db_authors.append((db_author, author.sequence))  # type: ignore
+            session.add(db_ref)
+            session.commit()
+
+            for i, (db_author, seq) in enumerate(_db_authors):
+                # create a link table object
+                link = AuthorReferenceLink(
+                    author_id=db_author.id,
+                    reference_id=db_ref.id,
+                    author_idx=i,
+                    author_squence=seq,
+                )
+                # add the objects to the session
+                session.add(link)
+                session.commit()

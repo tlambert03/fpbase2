@@ -1,4 +1,5 @@
 from datetime import datetime
+from functools import lru_cache
 from typing import Literal
 
 import requests
@@ -6,6 +7,18 @@ from pydantic import BaseModel, Field
 
 API_BASE = "https://api.crossref.org"
 MAIL_TO = "talley.lambert+fpbase@gmail.org"
+
+
+@lru_cache
+def crossref_work(doi: str) -> "Work":
+    from fpbase2 import __version__
+
+    url = f"{API_BASE}/works/{doi}"
+    ua = f"python-requests/{requests.__version__}"
+    ua += f" FPBase/{__version__} (https://fpbase.org/ mailto:{MAIL_TO})"
+    r = requests.get(url, headers={"User-Agent": ua, "X-USER-AGENT": ua})
+    r.raise_for_status()
+    return Work.parse_obj(r.json()["message"])
 
 
 class Reference(BaseModel):
@@ -32,7 +45,7 @@ class Author(BaseModel):
     name: str | None = None
     authenticated_orcid: bool | None = Field(None, alias="authenticated-orcid")
     prefix: str | None = None
-    sequence: str
+    sequence: Literal["first", "additional"] | None = None
     # affiliation: List[Affiliation]
 
 
@@ -61,9 +74,10 @@ class Work(BaseModel):
     content_updated: DateParts | None = Field(None, alias="content-updated")
     edition_number: str | None = Field(None, alias="edition-number")
     posted: DateParts | None = None
-    group_title: list[str] | None = Field(None, alias="group-title")
-    reference: Reference | list[Reference] | None = None
 
+    # reference: Reference | list[Reference] | None = None
+
+    # group_title: list[str] | str | None = Field(None, alias="group-title")
     # content_created: DateParts | None = Field(None, alias="content-created")
     # language: str | None = None
     # deposited: Date
@@ -88,14 +102,3 @@ class WorkMessage(BaseModel):
     message_type: Literal["work"] = "work"
     message_version: str = Field(..., alias="message-version")
     message: Work
-
-
-def crossref_work(doi: str) -> WorkMessage:
-    from fpbase2 import __version__
-
-    url = f"{API_BASE}/works/{doi}"
-    ua = f"python-requests/{requests.__version__}"
-    ua += f" FPBase/{__version__} (https://fpbase.org/ mailto:{MAIL_TO})"
-    r = requests.get(url, headers={"User-Agent": ua, "X-USER-AGENT": ua})
-    r.raise_for_status()
-    return WorkMessage.parse_obj(r.json())
