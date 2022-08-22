@@ -54,3 +54,4 @@ repos:
           - fastapi
           - sqlmodel
           - types-requests
+          - typer

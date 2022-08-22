@@ -1,21 +1,18 @@
-import os
 from typing import Iterator, TypeVar
 
-from dotenv import load_dotenv
 from sqlmodel import Session, SQLModel, create_engine, text
 
 from fpbase2 import db
+from fpbase2.core.config import settings
 from fpbase2.models.protein import Protein
 from fpbase2.models.reference import Author, AuthorReferenceLink, Reference
 from fpbase2.models.user import User
 from fpbase2.utils import crossref_work
 
-load_dotenv()
+URL = str(settings.PRODUCTION_DB_URL) or "postgresql:///fpbase"
+fpb_engine = create_engine(URL, echo=True)
 
-PRODUCTION_DB_URL = os.getenv("PRODUCT_DATABASE_URL", "postgresql:///fpbase")
-fpb_engine = create_engine(PRODUCTION_DB_URL, echo=True)
 M = TypeVar("M", bound=SQLModel)
-
 QUERIES: dict[type[SQLModel], str] = {
     User: "SELECT * FROM users_user ORDER BY date_joined LIMIT :limit",
     Protein: "SELECT * FROM proteins_protein ORDER BY created LIMIT :limit",
@@ -25,8 +22,14 @@ QUERIES: dict[type[SQLModel], str] = {
 
 def iter_fpb_table(Model: type[M], n: int = 10) -> Iterator[M]:
     with fpb_engine.connect() as conn:
-        for row in conn.execute(text(QUERIES[Model]), {"limit": n}):
-            yield Model(**row)
+        conn = conn.execution_options(
+            isolation_level="SERIALIZABLE",
+            postgresql_readonly=True,
+            postgresql_deferrable=True,
+        )
+        with conn.begin():
+            for row in conn.execute(text(QUERIES[Model]), {"limit": n}):
+                yield Model(**row)
 
 
 def add_fpb_objects(model: type[M], n: int = 10) -> None:
@@ -46,7 +49,7 @@ def add_fpb_users(n: int = 10) -> None:
     add_fpb_objects(User, n)
 
 
-def add_fpb_references(n: int = 50) -> None:
+def add_fpb_references(n: int = 10) -> None:
     with Session(db.engine) as session:
         # for every reference currently in FPbase
         for db_ref in iter_fpb_table(Reference, n):

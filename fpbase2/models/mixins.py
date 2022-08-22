@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 from typing import Any, Sequence, TypeVar
 
@@ -6,6 +5,7 @@ from sqlalchemy import text
 from sqlmodel import Field
 
 from .._vendored import SQLModel
+from ..core.config import settings
 from ..db._query import QueryManager
 
 
@@ -49,7 +49,7 @@ class QueryMixin(SQLModel):
     @property
     def q(cls: type[M]) -> QueryManager[M]:
         if cls._qm is None:
-            if os.getenv("ALLOW_QM") != "1":
+            if not settings.ALLOW_QM:
                 raise RuntimeError("QueryMixin is disabled, use ALLOW_QM=1 to enable")
             cls._qm = QueryManager(cls)
         return cls._qm

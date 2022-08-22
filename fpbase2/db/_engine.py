@@ -1,16 +1,14 @@
-from __future__ import annotations
-
-import os
-
-from dotenv import load_dotenv
+from sqlalchemy.orm import sessionmaker
 from sqlmodel import create_engine
 
-load_dotenv()
+from ..core.config import settings
 
-
-DEBUG = os.getenv("DEBUG", "0") != "0"
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///database.db")
+assert settings.DATABASE_URI, "DATABASE_URI is not set, cannot create engine"
 
 engine = create_engine(
-    DATABASE_URL, echo=DEBUG, connect_args={"check_same_thread": False}
+    settings.DATABASE_URI,
+    echo=settings.DEBUG,
+    pool_pre_ping=True,
+    connect_args={"check_same_thread": False},
 )
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

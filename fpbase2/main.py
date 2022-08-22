@@ -6,6 +6,7 @@ from sqlmodel import Session, select
 from fpbase2.db import create_db_and_tables, get_session
 from fpbase2.models.protein import Protein, ProteinCreate, ProteinRead, ProteinUpdate
 
+from .core.config import settings
 from .utils import create_object, delete_object, read_or_404, update_object
 
 
@@ -14,13 +15,23 @@ def custom_generate_unique_id(route: APIRoute) -> str:
     return f"{tag}-{route.name}"
 
 
-app = FastAPI(generate_unique_id_function=custom_generate_unique_id)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+def get_application() -> FastAPI:
+    _app = FastAPI(
+        title=settings.PROJECT_NAME,
+        generate_unique_id_function=custom_generate_unique_id,
+    )
+    _app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    return _app
+
+
+app = get_application()
 
 
 class URL:
