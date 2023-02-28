@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str | None = None
     POSTGRES_DB: str | None = None
     SQLITE_DB: str | None = None
-    DATABASE_URI: SQLiteDsn | PostgresDsn | str = 'sqlite://'
+    DATABASE_URI: SQLiteDsn | PostgresDsn = SQLiteDsn.build(scheme="sqlite", host="/")
     PRODUCTION_DB_URL: PostgresDsn | None = None
 
     class Config:
