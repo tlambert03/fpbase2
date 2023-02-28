@@ -8,14 +8,24 @@ A rewrite of the FPbase backend, using
 
 ## Installation
 
+[install poetry](https://python-poetry.org/docs/#installation) (if you don't already have it),
+then:
+
 ```bash
-git clone
+git clone https://github.com/tlambert03/fpbase2.git
 cd fpbase2
 poetry install
+poetry run pytest
 ```
+
+(You can also use `poetry shell` to activate the virtual environment,
+and then run `pytest` directly)
 
 ## Usage
 
 ```bash
 fpb run
 ```
+
+Then navigate to <http://127.0.0.1:8000/docs> to see the interactive
+API docs.

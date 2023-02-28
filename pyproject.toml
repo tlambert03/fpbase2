@@ -39,6 +39,7 @@ fpb = "fpbase2._cli:app"
 
 [tool.poetry.group.dev.dependencies]
 httpx = "^0.23.3"
+datamodel-code-generator = "^0.17.1"
 
 [tool.ruff]
 target-version = "py310"
