@@ -1,3 +1,7 @@
+"""main fpbase cli.
+
+fpb --help
+"""
 import os
 import subprocess
 from pathlib import Path

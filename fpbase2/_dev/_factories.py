@@ -2,8 +2,9 @@ from functools import partial
 from random import choices
 
 from faker import Faker
-from fpbase2.models.protein import Protein
 from pydantic_factories import ModelFactory
+
+from fpbase2.models.protein import Protein
 
 AA_LETTERS: str = "ARNDCEQGHILKMFPSTWYV"
 fake = Faker()

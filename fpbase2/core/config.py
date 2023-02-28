@@ -1,6 +1,12 @@
 from typing import Any
 
-from pydantic import AnyHttpUrl, AnyUrl, BaseSettings, PostgresDsn, validator
+from pydantic import (
+    AnyHttpUrl,
+    AnyUrl,
+    BaseSettings,
+    PostgresDsn,
+    validator,
+)
 
 
 class SQLiteDsn(AnyUrl):
@@ -9,10 +15,21 @@ class SQLiteDsn(AnyUrl):
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str
+    PROJECT_NAME: str = "fpbase"
     DEBUG: bool = False
     ALLOW_QM: bool = False
     BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
+    POSTGRES_SERVER: str | None = None
+    POSTGRES_USER: str | None = None
+    POSTGRES_PASSWORD: str | None = None
+    POSTGRES_DB: str | None = None
+    SQLITE_DB: str | None = None
+    DATABASE_URI: SQLiteDsn | PostgresDsn | str = 'sqlite://'
+    PRODUCTION_DB_URL: PostgresDsn | None = None
+
+    class Config:
+        case_sensitive = True
+        env_file = ".env"
 
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(cls, v: str | list[str]) -> list[str] | str:
@@ -22,32 +39,23 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    POSTGRES_SERVER: str | None = None
-    POSTGRES_USER: str | None = None
-    POSTGRES_PASSWORD: str | None = None
-    POSTGRES_DB: str | None = None
-    SQLITE_DB: str | None = None
-    DATABASE_URI: SQLiteDsn | PostgresDsn | None = None
-
-    PRODUCTION_DB_URL: PostgresDsn | None = None
-
     @validator("DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: str | None, values: dict[str, Any]) -> Any:
         if isinstance(v, str):
             return v
         elif sqlite_db := values.get("SQLITE_DB"):
             return SQLiteDsn.build(scheme="sqlite", host="/", path=sqlite_db)
-        return PostgresDsn.build(
-            scheme="postgresql",
-            user=values.get("POSTGRES_USER"),
-            password=values.get("POSTGRES_PASSWORD"),
-            host=values.get("POSTGRES_SERVER"),
-            path=f"/{values.get('POSTGRES_DB') or ''}",
+        return (
+            PostgresDsn.build(
+                scheme="postgresql",
+                host=host,
+                user=values.get("POSTGRES_USER"),
+                password=values.get("POSTGRES_PASSWORD"),
+                path=f"/{values.get('POSTGRES_DB') or ''}",
+            )
+            if (host := values.get("POSTGRES_SERVER"))
+            else None
         )
-
-    class Config:
-        case_sensitive = True
-        env_file = ".env"
 
 
 settings = Settings()

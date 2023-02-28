@@ -5,3 +5,17 @@
 A rewrite of the FPbase backend, using
 [sqlmodel](https://github.com/tiangolo/sqlmodel) and
 [FastAPI](https://fastapi.tiangolo.com)
+
+## Installation
+
+```bash
+git clone
+cd fpbase2
+poetry install
+```
+
+## Usage
+
+```bash
+fpb run
+```

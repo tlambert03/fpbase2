@@ -1,8 +1,9 @@
 from collections.abc import Iterator
 
-from fpbase2.models.protein import Protein
 from rich import print
 from sqlalchemy import create_engine, text
+
+from fpbase2.models.protein import Protein
 
 DB_URL = "postgresql:///fpbase"
 engine = create_engine(DB_URL, echo=True, future=True)

@@ -2,10 +2,11 @@ import sys
 
 import pytest
 from fastapi.testclient import TestClient
-from fpbase2.db import get_session
-from fpbase2.main import app
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
+
+from fpbase2.db import get_session
+from fpbase2.main import app
 
 
 @pytest.fixture
