@@ -1,6 +1,8 @@
 """main fpbase cli.
 
-fpb --help
+run with `fpb`:
+
+    fpb --help
 """
 import os
 import subprocess
@@ -66,6 +68,7 @@ def rebuild(
     from fpbase2.core.config import settings
     from fpbase2.db import create_db_and_tables
 
+    typer.echo(f"Rebuilding database... {settings.DATABASE_URI}")
     if (uri := settings.DATABASE_URI) and uri.scheme == "sqlite":
         Path(str(uri.path).lstrip("/")).unlink(missing_ok=True)
         create_db_and_tables()
