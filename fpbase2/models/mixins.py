@@ -1,13 +1,11 @@
 from collections.abc import Sequence
 from datetime import datetime
-from typing import Any, TypeVar
+from typing import Any
 
 from sqlalchemy import text
 from sqlmodel import Field
 
 from fpbase2._vendored import SQLModel
-from fpbase2.core.config import settings
-from fpbase2.db._query import QueryManager
 
 
 class TimeStampedModel(SQLModel):
@@ -40,17 +38,3 @@ class Authorable(SQLModel):
         return [i for i in args if i[0] not in Authorable.__dict__]
 
 
-M = TypeVar("M", bound="QueryMixin")
-
-
-class QueryMixin(SQLModel):
-    _qm: QueryManager | None = None
-
-    @classmethod  # type: ignore
-    @property
-    def q(cls: type[M]) -> QueryManager[M]:
-        if cls._qm is None:
-            if not settings.ALLOW_QM:
-                raise RuntimeError("QueryMixin is disabled, use ALLOW_QM=1 to enable")
-            cls._qm = QueryManager(cls)
-        return cls._qm

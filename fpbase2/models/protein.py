@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from sqlmodel import JSON, Column, Field, Relationship, text
 
 from fpbase2._typed_sa import on_before_save
+from fpbase2.db._query import QueryDescriptor
 from fpbase2.utils.text import new_id, slugify
 from fpbase2.validators import UNIPROT_REGEX
 
-from .mixins import Authorable, QueryMixin, TimeStampedModel
+from .mixins import Authorable, TimeStampedModel
 from .reference import Reference
 from .user import User
 
@@ -91,7 +92,7 @@ class ProteinUpdate(ProteinBase):
     seq_validated: bool = False
 
 
-class Protein(ProteinBase, QueryMixin, table=True):
+class Protein(ProteinBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     # TODO: allow_mutation = False
     uuid: str | None = Field(default=None, index=True, max_length=5, **UNIQUE)
@@ -104,6 +105,8 @@ class Protein(ProteinBase, QueryMixin, table=True):
         sa_relationship_kwargs={"primaryjoin": "User.id==Protein.updated_by_id"}
     )
     primary_reference: Reference | None = Relationship(back_populates="proteins")
+
+    q: ClassVar[QueryDescriptor[Protein]] = QueryDescriptor()
 
     @on_before_save
     def _on_before_save(self, _: Any, conn: Connection) -> None:

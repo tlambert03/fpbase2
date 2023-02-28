@@ -1,12 +1,13 @@
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, ClassVar, Optional
 
 from sqlmodel import Field, Relationship, SQLModel, UniqueConstraint
 
+from fpbase2.db._query import QueryDescriptor
 from fpbase2.validators import DOI_REGEX
 
-from .mixins import Authorable, QueryMixin, TimeStampedModel
+from .mixins import Authorable, TimeStampedModel
 
 if TYPE_CHECKING:
     from .protein import Protein
@@ -17,7 +18,7 @@ class AuthorSequence(str, Enum):
     ADDITIONAL = "additional"
 
 
-class AuthorReferenceLink(QueryMixin, table=True):
+class AuthorReferenceLink(SQLModel, table=True):
     author_id: int | None = Field(None, foreign_key="author.id", primary_key=True)
     reference_id: int | None = Field(None, foreign_key="reference.id", primary_key=True)
     author_idx: int = Field(ge=0)
@@ -25,6 +26,7 @@ class AuthorReferenceLink(QueryMixin, table=True):
 
     # author: "Author" = Relationship(back_populates="reference_links")
     # reference: "Reference" = Relationship(back_populates="author_links")
+    q: ClassVar[QueryDescriptor["AuthorReferenceLink"]] = QueryDescriptor()
 
 
 class AuthorBase(TimeStampedModel):
@@ -33,7 +35,7 @@ class AuthorBase(TimeStampedModel):
     orcid: str | None = Field(None, sa_column_kwargs={"unique": True})
 
 
-class Author(AuthorBase, QueryMixin, table=True):
+class Author(AuthorBase, table=True):
     __table_args__ = (UniqueConstraint("family", "given", name="_family_given_uc"),)
     id: int | None = Field(default=None, primary_key=True)
 
@@ -71,7 +73,7 @@ class ReferenceBase(Authorable, TimeStampedModel):
     date: datetime | None = None
 
 
-class Reference(ReferenceBase, QueryMixin, table=True):
+class Reference(ReferenceBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     proteins: Optional["Protein"] = Relationship(back_populates="primary_reference")
 
@@ -79,6 +81,8 @@ class Reference(ReferenceBase, QueryMixin, table=True):
         back_populates="references", link_model=AuthorReferenceLink
     )
     # author_links: list[AuthorReferenceLink] = Relationship(back_populates="reference")
+
+    q: ClassVar[QueryDescriptor["Reference"]] = QueryDescriptor()
 
 
 class ReferenceCreate(SQLModel):

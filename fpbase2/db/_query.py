@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, cast, overload
 
 from sqlalchemy.sql.elements import ColumnElement
 from sqlmodel import Session, SQLModel, func, select
-from sqlmodel.sql.expression import Select, SelectOfScalar
+
+from fpbase2.core.config import settings
 
 if TYPE_CHECKING:
     from sqlalchemy.future import Engine
@@ -15,31 +15,49 @@ M = TypeVar("M", bound=SQLModel)
 _SESSIONS: dict[str, Session] = {}
 
 
-@lru_cache
-def _patch_select() -> None:
-    # inherit caching, silence warning
-    # https://github.com/tiangolo/sqlmodel/issues/189
-    SelectOfScalar.inherit_cache = True
-    Select.inherit_cache = True
-
-
 class QueryManager(Generic[M]):
+    """Convenience accessor for SQLModel queries.
+
+    Methods include:
+        all: Return all rows.
+        cout: Return the number of rows.
+        first: Return the first row.
+        random(n=1): Return a random row or rows.
+        where(expression, limit=1): Return rows matching the expression.
+        get(id): Return the row with the given id.
+        create(**kwargs): Create a new row.
+
+    Examples
+    --------
+    ```python
+    class User(SQLModel, table=True):
+        id: int | None = Field(default=None, primary_key=True)
+        name: str
+        email: str
+
+        q: ClassVar[QueryDescriptor["User"]] = QueryDescriptor()
+
+    user = User.q.first()
+    all_users = User.q.all()
+    frank = User.q.where(User.name == "Frank")
+    ```
+    """
+
     def __init__(self, model: type[M], engine: Engine | None = None) -> None:
+        self._model = model
         if engine is None:
             from . import _engine
 
             engine = _engine.engine
 
-        _patch_select()
-        self._model = model
         if str(engine.url) not in _SESSIONS:
             _SESSIONS[str(engine.url)] = Session(engine)
         self.session = _SESSIONS[str(engine.url)]
 
     @overload
-    def _select(  # type: ignore
+    def _select(
         self,
-        limit: Literal[1] = 1,
+        limit: Literal[1] = ...,
         order_by: Any = None,
         where: ColumnElement | None = None,
     ) -> M:
@@ -134,3 +152,16 @@ class QueryManager(Generic[M]):
         self.session.commit()
         self.session.refresh(db_obj)
         return db_obj
+
+
+class QueryDescriptor(Generic[M]):
+    def __init__(self) -> None:
+        self._qm: QueryManager | None = None
+
+    def __get__(self, instance: M, owner: type[M]) -> QueryManager[M]:
+        if self._qm is None:
+            if settings.ALLOW_QM:
+                self._qm = QueryManager(owner)
+            else:
+                raise RuntimeError("QueryMixin is disabled, set ALLOW_QM=1 to enable")
+        return self._qm

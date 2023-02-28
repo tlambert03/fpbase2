@@ -1,9 +1,10 @@
 from datetime import datetime
+from typing import ClassVar
 
 from pydantic import EmailStr
 from sqlmodel import Field, SQLModel, text
 
-from fpbase2.models.mixins import QueryMixin
+from fpbase2.db._query import QueryDescriptor
 
 
 class UserBase(SQLModel):
@@ -27,5 +28,7 @@ class UserBase(SQLModel):
     groups: list[str] | None = None
 
 
-class User(UserBase, QueryMixin, table=True):
+class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
+
+    q: ClassVar[QueryDescriptor["User"]] = QueryDescriptor()
