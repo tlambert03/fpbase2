@@ -19,8 +19,8 @@ _SESSIONS: dict[str, Session] = {}
 def _patch_select() -> None:
     # inherit caching, silence warning
     # https://github.com/tiangolo/sqlmodel/issues/189
-    SelectOfScalar.inherit_cache = True  # type: ignore
-    Select.inherit_cache = True  # type: ignore
+    SelectOfScalar.inherit_cache = True
+    Select.inherit_cache = True
 
 
 class QueryManager(Generic[M]):

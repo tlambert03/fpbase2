@@ -1,7 +1,8 @@
 """Typed variants of sqlalchemy functions."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Sequence, TypeVar
+from collections.abc import Callable, Sequence
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from pydantic.fields import ModelPrivateAttr
 from sqlalchemy import event

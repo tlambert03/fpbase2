@@ -1,12 +1,13 @@
+from collections.abc import Sequence
 from datetime import datetime
-from typing import Any, Sequence, TypeVar
+from typing import Any, TypeVar
 
 from sqlalchemy import text
 from sqlmodel import Field
 
-from .._vendored import SQLModel
-from ..core.config import settings
-from ..db._query import QueryManager
+from fpbase2._vendored import SQLModel
+from fpbase2.core.config import settings
+from fpbase2.db._query import QueryManager
 
 
 class TimeStampedModel(SQLModel):
@@ -45,7 +46,7 @@ M = TypeVar("M", bound="QueryMixin")
 class QueryMixin(SQLModel):
     _qm: QueryManager | None = None
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     def q(cls: type[M]) -> QueryManager[M]:
         if cls._qm is None:

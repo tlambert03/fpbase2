@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING, Optional
 
 from sqlmodel import Field, Relationship, SQLModel, UniqueConstraint
 
-from ..validators import DOI_REGEX
+from fpbase2.validators import DOI_REGEX
+
 from .mixins import Authorable, QueryMixin, TimeStampedModel
 
 if TYPE_CHECKING:

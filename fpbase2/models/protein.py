@@ -5,9 +5,10 @@ from typing import TYPE_CHECKING, Any
 
 from sqlmodel import JSON, Column, Field, Relationship, text
 
-from .._typed_sa import on_before_save
-from ..utils.text import new_id, slugify
-from ..validators import UNIPROT_REGEX
+from fpbase2._typed_sa import on_before_save
+from fpbase2.utils.text import new_id, slugify
+from fpbase2.validators import UNIPROT_REGEX
+
 from .mixins import Authorable, QueryMixin, TimeStampedModel
 from .reference import Reference
 from .user import User

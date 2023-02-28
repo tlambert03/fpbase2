@@ -1,7 +1,8 @@
 import re
 import unicodedata
+from collections.abc import Container, Sequence
 from random import choices
-from typing import Any, Container, Sequence
+from typing import Any
 
 
 def slugify(value: Any, allow_unicode: bool = False) -> str:

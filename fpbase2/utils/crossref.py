@@ -16,7 +16,7 @@ def crossref_work(doi: str) -> "Work":
     url = f"{API_BASE}/works/{doi}"
     ua = f"python-requests/{requests.__version__}"
     ua += f" FPBase/{__version__} (https://fpbase.org/ mailto:{MAIL_TO})"
-    r = requests.get(url, headers={"User-Agent": ua, "X-USER-AGENT": ua})
+    r = requests.get(url, headers={"User-Agent": ua, "X-USER-AGENT": ua}, timeout=10)
     r.raise_for_status()
     return Work.parse_obj(r.json()["message"])
 

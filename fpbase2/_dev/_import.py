@@ -1,6 +1,5 @@
-from typing import Iterator, TypeVar
-
-from sqlmodel import Session, SQLModel, create_engine, text
+from collections.abc import Iterator
+from typing import TypeVar
 
 from fpbase2 import db
 from fpbase2.core.config import settings
@@ -8,6 +7,7 @@ from fpbase2.models.protein import Protein
 from fpbase2.models.reference import Author, AuthorReferenceLink, Reference
 from fpbase2.models.user import User
 from fpbase2.utils import crossref_work
+from sqlmodel import Session, SQLModel, create_engine, text
 
 URL = str(settings.PRODUCTION_DB_URL) or "postgresql:///fpbase"
 fpb_engine = create_engine(URL, echo=True)
