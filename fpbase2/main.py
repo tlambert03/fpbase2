@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 from sqlmodel import Session, select
 
+from fpbase2.api.legacy.api import api_router as legacy_api_router
 from fpbase2.db import create_db_and_tables, get_session
 from fpbase2.models.protein import Protein, ProteinCreate, ProteinRead, ProteinUpdate
 
@@ -32,6 +33,7 @@ def get_application() -> FastAPI:
 
 
 app = get_application()
+app.include_router(legacy_api_router, prefix="/legacy")
 
 
 class URL:
