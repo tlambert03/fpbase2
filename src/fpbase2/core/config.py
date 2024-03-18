@@ -47,23 +47,15 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "fpbase"
     DEBUG: bool = False
 
+    # either DB_SQLITE_PATH or POSTGRES_SERVER & POSTGRES_USER must be set
+    # DB_SQLITE_PATH takes precedence
+    DB_SQLITE_PATH: Literal[":memory:"] | str | None = None
+
     POSTGRES_SERVER: str | None = None
     POSTGRES_PORT: int = 5432
     POSTGRES_USER: str | None = None
     POSTGRES_PASSWORD: str | None = None
     POSTGRES_DB: str = ""
-
-    DB_SQLITE_PATH: Literal[":memory:"] | str | None = None
-
-    @model_validator(mode="after")
-    def _check_db_provided(self) -> Self:
-        if not self.DB_SQLITE_PATH:
-            if not self.POSTGRES_SERVER and self.POSTGRES_USER:
-                raise ValueError(
-                    "Either DB_SQLITE_PATH or POSTGRES_SERVER and POSTGRES_USER "
-                    "environment variables must be set"
-                )
-        return self
 
     @computed_field  # type: ignore[misc]
     @property
@@ -82,6 +74,16 @@ class Settings(BaseSettings):
             port=self.POSTGRES_PORT,
             path=self.POSTGRES_DB,
         )
+
+    @model_validator(mode="after")
+    def _check_db_provided(self) -> Self:
+        if not self.DB_SQLITE_PATH:
+            if not self.POSTGRES_SERVER and self.POSTGRES_USER:
+                raise ValueError(
+                    "Either DB_SQLITE_PATH or POSTGRES_SERVER and POSTGRES_USER "
+                    "environment variables must be set"
+                )
+        return self
 
     # my stuff
     ALLOW_QM: bool = False
