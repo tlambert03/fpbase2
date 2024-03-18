@@ -6,7 +6,6 @@ from sqlmodel.pool import StaticPool
 
 from fpbase2.core.config import settings
 
-breakpoint()
 engine = create_engine(
     str(settings.SQLALCHEMY_DATABASE_URI),
     echo=settings.DEBUG,
