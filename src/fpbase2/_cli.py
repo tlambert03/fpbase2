@@ -54,7 +54,7 @@ def shell() -> None:
     c.InteractiveShell.colors = "Neutral"
     c.InteractiveShell.confirm_exit = False
     c.TerminalIPythonApp.display_banner = False
-    IPython.start_ipython([], config=c)  # type: ignore
+    IPython.start_ipython([], config=c)
 
 
 @app.command()
@@ -67,12 +67,12 @@ def rebuild(
 
     from fpbase2._dev._import import add_fpb_proteins, add_fpb_references, add_fpb_users
     from fpbase2.core.config import settings
-    from fpbase2.core.db import init_db
+    # from fpbase2.core.db import init_db
 
     typer.echo(f"Rebuilding database... {settings.SQLALCHEMY_DATABASE_URI}")
     if (uri := settings.SQLALCHEMY_DATABASE_URI) and uri.scheme == "sqlite":
         Path(str(uri.path).lstrip("/")).unlink(missing_ok=True)
-        init_db()
+        # init_db()
 
     add_fpb_users()
     add_fpb_references()

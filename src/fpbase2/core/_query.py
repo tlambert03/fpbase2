@@ -66,25 +66,16 @@ class QueryManager(Generic[M]):
 
     @overload
     def _select(
-        self,
-        limit: Literal[1] = ...,
-        order_by: Any = None,
-        where: ColumnElement | None = None,
+        self, limit: None = ..., order_by: Any = ..., where: ColumnElement | None = ...
+    ) -> list[M]: ...
+    @overload
+    def _select(  # type: ignore[overload-overlap]
+        self, limit: Literal[1], order_by: Any = ..., where: ColumnElement | None = ...
     ) -> M: ...
-
     @overload
     def _select(
-        self,
-        limit: Literal[None],
-        order_by: Any = None,
-        where: ColumnElement | None = None,
+        self, limit: int, order_by: Any = ..., where: ColumnElement | None = ...
     ) -> list[M]: ...
-
-    @overload
-    def _select(
-        self, limit: int, order_by: Any = None, where: ColumnElement | None = None
-    ) -> list[M]: ...
-
     def _select(
         self,
         limit: int | None = None,

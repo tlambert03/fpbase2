@@ -32,9 +32,11 @@ repos:
     rev: v1.9.0
     hooks:
       - id: mypy
-        files: "^fpbase2/"
+        files: "^src/"
         additional_dependencies:
           - fastapi
           - sqlmodel
           - types-requests
           - typer
+          - pydantic[email]
+          - pydantic-settings
