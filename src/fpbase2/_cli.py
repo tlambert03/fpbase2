@@ -48,7 +48,7 @@ def shell() -> None:
         "from rich import print",
         "from rich import pretty; pretty.install()",
         "session = Session(engine)",
-        "init_db()",
+        "init_db(session)",
     ]
 
     c.InteractiveShell.colors = "Neutral"

@@ -2,7 +2,7 @@ import secrets
 from functools import partial
 
 from faker import Faker
-from pydantic_factories import ModelFactory
+from polyfactory.factories.pydantic_factory import ModelFactory
 
 from fpbase2.models.protein import Protein
 

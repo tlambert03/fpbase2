@@ -48,6 +48,7 @@ email-validator==2.1.1
 executing==2.0.1
     # via stack-data
 faker==24.2.0
+    # via polyfactory
     # via pydantic-factories
 fancycompleter==0.9.1
     # via pdbpp
@@ -113,6 +114,7 @@ platformdirs==4.2.0
     # via virtualenv
 pluggy==1.4.0
     # via pytest
+polyfactory==2.15.0
 pre-commit==3.6.2
 prompt-toolkit==3.0.43
     # via ipython
@@ -182,6 +184,7 @@ types-requests==2.31.0.20240311
 typing-extensions==4.10.0
     # via fastapi
     # via mypy
+    # via polyfactory
     # via psycopg
     # via pydantic
     # via pydantic-core

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from enum import Enum
 from typing import TYPE_CHECKING, Any, ClassVar
 
@@ -11,12 +9,12 @@ from fpbase2.utils.text import new_id, slugify
 from fpbase2.validators import UNIPROT_REGEX
 
 from .mixins import Authorable, TimeStampedModel
+from .reference import Reference
+from .user import User
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import Connection
 
-    from .reference import Reference
-    from .user import User
 
 UNIQUE: Any = {"sa_column_kwargs": {"unique": True}}
 
@@ -99,18 +97,21 @@ class Protein(ProteinBase, table=True):
     uuid: str | None = Field(default=None, index=True, max_length=5, **UNIQUE)
     slug: str | None = Field(default=None, **UNIQUE)
     seq_validated: bool = False
-    created_by: User | None = Relationship(
-        sa_relationship_kwargs={"primaryjoin": "User.id==Protein.created_by_id"},
+
+    created_by_id: int | None = Field(
+        default=None, foreign_key="user.id", nullable=False
     )
-    updated_by: User | None = Relationship(
-        sa_relationship_kwargs={"primaryjoin": "User.id==Protein.updated_by_id"}
-    )
+    created_by: User | None = Relationship(back_populates="proteins")
+    # updated_by_id: int | None = Field(
+    #     default=None, foreign_key="user.id", nullable=False
+    # )
+    # updated_by: User | None = Relationship(back_populates="proteins_updated")
     primary_reference: Reference | None = Relationship(back_populates="proteins")
 
-    q: ClassVar[QueryDescriptor[Protein]] = QueryDescriptor()
+    q: ClassVar[QueryDescriptor["Protein"]] = QueryDescriptor()
 
     @on_before_save
-    def _on_before_save(self, _: Any, conn: Connection) -> None:
+    def _on_before_save(self, _: Any, conn: "Connection") -> None:
         if self.uuid is None:
             result = conn.execute(text("SELECT uuid FROM protein"))
             self.uuid = new_id(existing={i[0] for i in result if i[0]})

@@ -1,11 +1,13 @@
 from datetime import datetime
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
-from sqlmodel import Field, SQLModel, text
+from sqlmodel import Field, Relationship, SQLModel, text
 
 from fpbase2.core._query import QueryDescriptor
 
 # TODO replace email str with EmailStr when sqlmodel supports it
+if TYPE_CHECKING:
+    from .protein import Protein
 
 
 class UserBase(SQLModel):
@@ -28,7 +30,10 @@ class UserBase(SQLModel):
     is_superuser: bool | None = None
 
 
+
 class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
+    proteins: list["Protein"] = Relationship(back_populates="created_by")
+    # proteins_updated: list["Protein"] = Relationship(back_populates="updated_by")
 
     q: ClassVar[QueryDescriptor["User"]] = QueryDescriptor()
