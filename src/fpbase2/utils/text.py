@@ -1,7 +1,7 @@
 import re
+import secrets
 import unicodedata
 from collections.abc import Container, Sequence
-from random import choices
 from typing import Any
 
 
@@ -32,6 +32,7 @@ def new_id(
     # in sqlite, this could be: `substr(hex(randomblob(3)), 1, 6)`
     i = 0
     while (i := i + 1) < 100:
-        if (_uuid := "".join(choices(opts, k=k))) not in existing:
+        _uuid = "".join(secrets.choice(opts) for _ in range(k))
+        if _uuid not in existing:
             return _uuid
     raise RuntimeError("Could not generate unique uuid.")  # pragma: no cover

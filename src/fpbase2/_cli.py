@@ -4,6 +4,7 @@ run with `fpb`:
 
     fpb --help
 """
+
 import os
 import subprocess
 from pathlib import Path
@@ -25,7 +26,7 @@ def run(
     if verbose:
         args.extend(["--log-level", "debug"])
     app_file = os.getenv("FASTAPI_APP", "fpbase2.main")
-    subprocess.call(["uvicorn", f"{app_file}:app", *args])
+    subprocess.call(["uvicorn", f"{app_file}:app", *args])  # noqa: S603, S607
 
 
 @app.command()
@@ -38,7 +39,7 @@ def shell() -> None:
     c.InteractiveShellApp.exec_lines = [
         "from sqlmodel import *",
         "from fpbase2.models.protein import *",
-        "from fpbase2.db import *",
+        "from fpbase2.core.db import *",
         "from fpbase2.core.config import settings",
         "from fpbase2._dev import *",
         "from fpbase2._dev._import import *",
@@ -47,13 +48,13 @@ def shell() -> None:
         "from rich import print",
         "from rich import pretty; pretty.install()",
         "session = Session(engine)",
-        "create_db_and_tables()",
+        "init_db()",
     ]
 
     c.InteractiveShell.colors = "Neutral"
     c.InteractiveShell.confirm_exit = False
     c.TerminalIPythonApp.display_banner = False
-    IPython.start_ipython([], config=c)
+    IPython.start_ipython([], config=c)  # type: ignore
 
 
 @app.command()
@@ -66,12 +67,12 @@ def rebuild(
 
     from fpbase2._dev._import import add_fpb_proteins, add_fpb_references, add_fpb_users
     from fpbase2.core.config import settings
-    from fpbase2.db import create_db_and_tables
+    from fpbase2.core.db import init_db
 
-    typer.echo(f"Rebuilding database... {settings.DATABASE_URI}")
-    if (uri := settings.DATABASE_URI) and uri.scheme == "sqlite":
+    typer.echo(f"Rebuilding database... {settings.SQLALCHEMY_DATABASE_URI}")
+    if (uri := settings.SQLALCHEMY_DATABASE_URI) and uri.scheme == "sqlite":
         Path(str(uri.path).lstrip("/")).unlink(missing_ok=True)
-        create_db_and_tables()
+        init_db()
 
     add_fpb_users()
     add_fpb_references()
@@ -83,5 +84,5 @@ def rebuild(
 @app.command()
 def check() -> None:
     """Run checks"""
-    proc = subprocess.run(["pre-commit", "run", "--all-files"])
+    proc = subprocess.run(["pre-commit", "run", "--all-files"])  # noqa: S603, S607
     typer.Exit(proc.returncode)

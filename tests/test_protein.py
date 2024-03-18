@@ -1,4 +1,5 @@
 import pytest
+from fastapi.exceptions import HTTPException
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
@@ -39,13 +40,13 @@ def test_create_protein_invalid(client: TestClient):
 
 # TODO
 @pytest.mark.filterwarnings("ignore:Class SelectOfScalar will not make use of SQL")
-def test_read_proteins(session: Session, client: TestClient):
+def test_read_proteins(db: Session, client: TestClient):
     egfp = Protein(name="EGFP", seq="ABCDE", aliases=["OG"], agg="td")
     assert not egfp.id
     mcherry = Protein(name="mCherry", seq="FGHIJ")
-    session.add(egfp)
-    session.add(mcherry)
-    session.commit()
+    db.add(egfp)
+    db.add(mcherry)
+    db.commit()
     assert egfp.id
 
     response = client.get("/proteins/")
@@ -65,10 +66,10 @@ def test_read_proteins(session: Session, client: TestClient):
     assert data[1]["slug"] == mcherry.slug == "mcherry"
 
 
-def test_read_protein(session: Session, client: TestClient):
+def test_read_protein(db: Session, client: TestClient):
     egfp = Protein(name="EGFP", seq="ABCDE")
-    session.add(egfp)
-    session.commit()
+    db.add(egfp)
+    db.commit()
 
     response = client.get(f"/proteins/{egfp.id}")
     data = response.json()
@@ -80,10 +81,10 @@ def test_read_protein(session: Session, client: TestClient):
     assert data["slug"] == egfp.slug
 
 
-def test_update_protein(session: Session, client: TestClient):
+def test_update_protein(db: Session, client: TestClient):
     egfp = Protein(name="EGFP", seq="ABCDE", aliases=["OG"], agg="td")
-    session.add(egfp)
-    session.commit()
+    db.add(egfp)
+    db.commit()
 
     assert egfp.slug == "egfp"
     assert egfp.agg == "td"
@@ -104,14 +105,14 @@ def test_update_protein(session: Session, client: TestClient):
     assert data["agg"] == "m"
 
 
-def test_delete_protein(session: Session, client: TestClient):
+def test_delete_protein(db: Session, client: TestClient):
     egfp = Protein(name="EGFP", seq="ABCDE")
-    session.add(egfp)
-    session.commit()
+    db.add(egfp)
+    db.commit()
 
     response = client.delete(f"/proteins/{egfp.id}")
     assert response.status_code == 200
 
-    assert session.get(Protein, egfp.id) is None
-    with pytest.raises(Exception):
-        assert read_or_404(session, Protein, egfp.id)
+    assert db.get(Protein, egfp.id) is None
+    with pytest.raises(HTTPException):
+        assert read_or_404(db, Protein, egfp.id)

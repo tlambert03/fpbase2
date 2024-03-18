@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import ClassVar
 
-from pydantic import EmailStr
 from sqlmodel import Field, SQLModel, text
 
-from fpbase2.db._query import QueryDescriptor
+from fpbase2.core._query import QueryDescriptor
 
+# TODO replace email str with EmailStr when sqlmodel supports it
 
 class UserBase(SQLModel):
     username: str = Field(index=True, max_length=150, sa_column_kwargs={"unique": True})
@@ -13,7 +13,7 @@ class UserBase(SQLModel):
     first_name: str | None = None
     last_name: str | None = None
     name: str | None = None
-    email: EmailStr
+    email: str = Field(unique=True, index=True)
 
     last_login: datetime | None = None
     date_joined: datetime = Field(
@@ -25,7 +25,6 @@ class UserBase(SQLModel):
     is_active: bool = True
     is_staff: bool = False
     is_superuser: bool | None = None
-    groups: list[str] | None = None
 
 
 class User(UserBase, table=True):

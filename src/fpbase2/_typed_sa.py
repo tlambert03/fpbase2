@@ -1,8 +1,9 @@
 """Typed variants of sqlalchemy functions."""
+
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 from pydantic.fields import ModelPrivateAttr
 from sqlalchemy import event
@@ -70,7 +71,7 @@ class EventDecorator(ModelPrivateAttr):
 
 
 class on_before_save(EventDecorator):
-    _events = ["before_insert", "before_update"]
+    _events: ClassVar[list[str]] = ["before_insert", "before_update"]
 
     def _arrange_sqla_args(self, *args: Any) -> tuple:
         return (args[-1], *args[:2])

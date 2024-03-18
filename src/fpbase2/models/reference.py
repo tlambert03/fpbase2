@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, ClassVar, Optional
 
 from sqlmodel import Field, Relationship, SQLModel, UniqueConstraint
 
-from fpbase2.db._query import QueryDescriptor
+from fpbase2.core._query import QueryDescriptor
 from fpbase2.validators import DOI_REGEX
 
 from .mixins import Authorable, TimeStampedModel
@@ -45,8 +45,7 @@ class Author(AuthorBase, table=True):
     # reference_links: list[AuthorReferenceLink] = Relationship(back_populates="author")
 
 
-class AuthorCreate(AuthorBase):
-    ...
+class AuthorCreate(AuthorBase): ...
 
 
 class AuthorUpdate(AuthorBase):

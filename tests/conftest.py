@@ -1,16 +1,16 @@
-import sys
+from collections.abc import Generator
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
-from fpbase2.db import get_session
+from fpbase2.core.db import init_db
 from fpbase2.main import app
 
 
-@pytest.fixture
-def session():
+@pytest.fixture(scope="session", autouse=True)
+def db() -> Generator[Session, None, None]:
     """Create a database engine for testing, and connect a session to it."""
     # create in-memory database with "sqlite://"
     # we need to also tell SQLAlchemy that we want to be able to use the same
@@ -19,17 +19,23 @@ def session():
     # https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#using-a-memory-database-in-multiple-threads
     engine = create_engine(
         "sqlite://",
-        connect_args={"check_same_thread": False},
+        # connect_args={"check_same_thread": False},
         poolclass=StaticPool,
-        echo="-v" in sys.argv,
+        # echo="-v" in sys.argv,
     )
     SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
+        # init_db(session)
         yield session
 
+        # statement = delete(Item)
+        # session.execute(statement)
+        # statement = delete(User)
+        # session.execute(statement)
+        # session.commit()
 
-@pytest.fixture
-def client(session: Session):
-    app.dependency_overrides[get_session] = lambda: session
-    yield TestClient(app)
-    app.dependency_overrides.clear()
+
+@pytest.fixture(scope="module")
+def client() -> Generator[TestClient, None, None]:
+    with TestClient(app) as c:
+        yield c

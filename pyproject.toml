@@ -1,50 +1,60 @@
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry]
+[project]
 name = "fpbase2"
 version = "0.1.0"
-description = ""
-authors = ["Talley Lambert <talley.lambert@gmail.com>"]
+description = "FPbase API client 2.0"
+authors = [{ name = "Talley Lambert", email = "talley.lambert@gmail.com" }]
+dependencies = [
+    "fastapi~=0.110.0",
+    "requests~=2.31.0",
+    "sqlmodel~=0.0.16",
+    "uvicorn[standard]>=0.28.0",
+    "pydantic[email]>=2.6.4",
+    "pydantic-settings>=2.2.1",
+]
+readme = "README.md"
+requires-python = ">= 3.11"
 
-[tool.poetry.dependencies]
-python = "~3.10"
-fastapi = "~0.92.0"
-requests = "^2.28.2"
-sqlalchemy = "1.4.35"
-sqlmodel = "^0.0.8"
-strawberry-graphql = "^0.159.0"
-uvicorn = { version = "^0.20.0", extras = ["standard"] }
-python-dotenv = "^1.0.0"
-pydantic = { extras = ["email"], version = "^1.10.5" }
-
-
-[tool.poetry.group.dev.dependencies]
-black = "^23.1.0"
-datamodel-code-generator = "^0.17.1"
-httpx = "^0.23.3"
-ipython = "^8.11.0"
-mypy = "^1.0.1"
-pdbpp = "^0.10.3"
-pre-commit = "^3.1.1"
-psycopg2 = { extras = ["binary"], version = "^2.9.5" }
-pydantic-factories = "^1.17.2"
-pytest = "^7.2.1"
-pytest-cov = "^4.0.0"
-rich = "^13.3.1"
-ruff = "^0.0.253"
-typer = "^0.7.0"
-types-requests = "^2.28.11.15"
-
-
-[tool.poetry.scripts]
+[project.scripts]
 fpb = "fpbase2._cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "python-dotenv>=1.0.1",
+    "black>=24.3.0",
+    "ipython>=8.22.2",
+    "pdbpp>=0.10.3",
+    "pre-commit>=3.6.2",
+    "pydantic-factories>=1.17.3",
+    "pytest>=8.1.1",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.3.3",
+    "typer>=0.9.0",
+    "types-requests>=2.31.0.20240311",
+    "mypy>=1.9.0",
+    "httpx~=0.25.1",
+    "datamodel-code-generator>=0.25.5",
+    "psycopg2[binary]>=2.9.9",
+    "psycopg[binary]>=3.1.18",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fpbase2"]
 
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 src = ["fpbase2"]
+fix = true
+
+[tool.ruff.lint]
 select = [
     "E",   # pyflakes
     "F",   # codestyle
@@ -54,21 +64,17 @@ select = [
     "S",   # bandit
     "B",   # bugbear
     "C4",  # flake8-comprehensions
-    "ISC", # flake8-implicit-str-concat
     "ICN", # flake8-import-conventions
     "TID", # flake8-tidy-imports
+    "TCH", # flake8-type-check
     "RUF", # ruff
 ]
-ignore = [
-    "B008", # do not perform function calls in argument defaults
-]
-fix = true
 
-[tool.ruff.isort]
-known-first-party = ["fpbase2"]
-
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["fpbase2"]
 
 # https://mypy.readthedocs.io/en/stable/config_file.html
 [tool.mypy]
@@ -88,9 +94,9 @@ module = ["tests.*"]
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
 
-# https://docs.pytest.org/en/6.2.x/customize.html
+# https://docs.pytest.org/en/latest/customize.html
 [tool.pytest.ini_options]
-minversion = "6.0"
+minversion = "7.0"
 addopts = ["--cov=fpbase2", "--cov-report=term-missing"]
 testpaths = ["tests"]
 filterwarnings = ["error"]
@@ -102,4 +108,5 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     "@overload",
     "except ImportError",
+    "\\.\\.\\.",
 ]

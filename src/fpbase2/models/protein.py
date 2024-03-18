@@ -6,16 +6,17 @@ from typing import TYPE_CHECKING, Any, ClassVar
 from sqlmodel import JSON, Column, Field, Relationship, text
 
 from fpbase2._typed_sa import on_before_save
-from fpbase2.db._query import QueryDescriptor
+from fpbase2.core._query import QueryDescriptor
 from fpbase2.utils.text import new_id, slugify
 from fpbase2.validators import UNIPROT_REGEX
 
 from .mixins import Authorable, TimeStampedModel
-from .reference import Reference
-from .user import User
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import Connection
+
+    from .reference import Reference
+    from .user import User
 
 UNIQUE: Any = {"sa_column_kwargs": {"unique": True}}
 

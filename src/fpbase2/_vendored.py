@@ -10,7 +10,7 @@ class SQLModelMetaclass(_SQLModelMetaclass):
         name: str,
         bases: tuple[type[Any], ...],
         class_dict: dict[str, Any],
-        **kwargs: Any
+        **kwargs: Any,
     ) -> Any:
         new_cls = super().__new__(cls, name, bases, class_dict, **kwargs)
 
@@ -24,5 +24,4 @@ class SQLModelMetaclass(_SQLModelMetaclass):
         return new_cls
 
 
-class SQLModel(_SQLModel, metaclass=SQLModelMetaclass):
-    ...
+class SQLModel(_SQLModel, metaclass=SQLModelMetaclass): ...

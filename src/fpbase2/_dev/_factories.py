@@ -1,5 +1,5 @@
+import secrets
 from functools import partial
-from random import choices
 
 from faker import Faker
 from pydantic_factories import ModelFactory
@@ -11,7 +11,7 @@ fake = Faker()
 
 
 def n_random_letters(n: int) -> str:
-    return "".join(choices(AA_LETTERS, k=n))
+    return "".join(secrets.choice(AA_LETTERS) for _ in range(n))
 
 
 class ProteinFactory(ModelFactory):

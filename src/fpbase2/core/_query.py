@@ -1,14 +1,24 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, cast, overload
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Generic,
+    Literal,
+    TypeVar,
+    cast,
+    overload,
+)
 
-from sqlalchemy.sql.elements import ColumnElement
 from sqlmodel import Session, SQLModel, func, select
 
 from fpbase2.core.config import settings
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from sqlalchemy.future import Engine
+    from sqlalchemy.sql.elements import ColumnElement
 
 
 M = TypeVar("M", bound=SQLModel)
@@ -46,7 +56,7 @@ class QueryManager(Generic[M]):
     def __init__(self, model: type[M], engine: Engine | None = None) -> None:
         self._model = model
         if engine is None:
-            from . import _engine
+            from ..db import _engine
 
             engine = _engine.engine
 
@@ -60,8 +70,7 @@ class QueryManager(Generic[M]):
         limit: Literal[1] = ...,
         order_by: Any = None,
         where: ColumnElement | None = None,
-    ) -> M:
-        ...
+    ) -> M: ...
 
     @overload
     def _select(
@@ -69,21 +78,19 @@ class QueryManager(Generic[M]):
         limit: Literal[None],
         order_by: Any = None,
         where: ColumnElement | None = None,
-    ) -> list[M]:
-        ...
+    ) -> list[M]: ...
 
     @overload
     def _select(
         self, limit: int, order_by: Any = None, where: ColumnElement | None = None
-    ) -> list[M]:
-        ...
+    ) -> list[M]: ...
 
     def _select(
         self,
         limit: int | None = None,
         order_by: Any = None,
         where: ColumnElement | None = None,
-    ) -> M | list[M] | None:
+    ) -> M | Sequence[M] | None:
         statement = select(self._model)
         if where is not None:
             statement = statement.where(where)
@@ -110,8 +117,7 @@ class QueryManager(Generic[M]):
         ...
 
     @overload
-    def random(self, n: int) -> list[M]:
-        ...
+    def random(self, n: int) -> list[M]: ...
 
     def random(self, n: int = 1) -> M | list[M]:
         return self._select(limit=n, order_by=func.random())
@@ -119,23 +125,19 @@ class QueryManager(Generic[M]):
     @overload
     def where(  # type: ignore
         self, expression: ColumnElement, limit: Literal[1] = 1
-    ) -> M:
-        ...
+    ) -> M: ...
 
     @overload
-    def where(self, expression: ColumnElement, limit: int | None = None) -> list[M]:
-        ...
+    def where(self, expression: ColumnElement, limit: int | None = None) -> list[M]: ...
 
     def where(self, expression: ColumnElement, limit: int | None = None) -> M | list[M]:
         return self._select(limit=limit, where=expression)
 
     @overload
-    def get(self, ident: Any, raises: Literal[True] = True) -> M:
-        ...
+    def get(self, ident: Any, raises: Literal[True] = True) -> M: ...
 
     @overload
-    def get(self, ident: Any, raises: Literal[False]) -> M | None:
-        ...
+    def get(self, ident: Any, raises: Literal[False]) -> M | None: ...
 
     def get(self, ident: Any, raises: bool = True) -> M | None:
         # sourcery skip: swap-nested-ifs
