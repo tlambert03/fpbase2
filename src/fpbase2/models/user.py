@@ -7,6 +7,7 @@ from fpbase2.core._query import QueryDescriptor
 
 # TODO replace email str with EmailStr when sqlmodel supports it
 
+
 class UserBase(SQLModel):
     username: str = Field(index=True, max_length=150, sa_column_kwargs={"unique": True})
     password: str

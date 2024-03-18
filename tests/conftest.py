@@ -5,7 +5,6 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
-from fpbase2.core.db import init_db
 from fpbase2.main import app
 
 

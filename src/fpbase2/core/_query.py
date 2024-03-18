@@ -56,7 +56,7 @@ class QueryManager(Generic[M]):
     def __init__(self, model: type[M], engine: Engine | None = None) -> None:
         self._model = model
         if engine is None:
-            from ..db import _engine
+            from fpbase2.db import _engine
 
             engine = _engine.engine
 

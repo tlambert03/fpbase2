@@ -77,7 +77,7 @@ def add_fpb_references(n: int = 10) -> None:
                     author_id=db_author.id,
                     reference_id=db_ref.id,
                     author_idx=i,
-                    author_squence=seq,
+                    author_sequence=seq,
                 )
                 # add the objects to the session
                 session.add(link)

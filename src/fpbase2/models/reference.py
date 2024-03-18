@@ -22,7 +22,7 @@ class AuthorReferenceLink(SQLModel, table=True):
     author_id: int | None = Field(None, foreign_key="author.id", primary_key=True)
     reference_id: int | None = Field(None, foreign_key="reference.id", primary_key=True)
     author_idx: int = Field(ge=0)
-    author_squence: AuthorSequence | None = None
+    author_sequence: AuthorSequence | None = None
 
     # author: "Author" = Relationship(back_populates="reference_links")
     # reference: "Reference" = Relationship(back_populates="author_links")
