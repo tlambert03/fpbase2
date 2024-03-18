@@ -3,7 +3,7 @@ from typing import TypeVar
 
 from sqlmodel import Session, SQLModel, create_engine, text
 
-from fpbase2 import db
+from fpbase2.core import db
 from fpbase2.models.protein import Protein
 from fpbase2.models.reference import Author, AuthorReferenceLink, Reference
 from fpbase2.models.user import User
@@ -28,7 +28,8 @@ def iter_fpb_table(Model: type[M], n: int = 10) -> Iterator[M]:
             postgresql_deferrable=True,
         )
         with conn.begin():
-            for row in conn.execute(text(QUERIES[Model]), {"limit": n}):
+            result = conn.execute(text(QUERIES[Model]), {"limit": n})
+            for row in result.mappings():
                 yield Model(**row)
 
 

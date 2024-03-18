@@ -40,6 +40,7 @@ dev-dependencies = [
     "datamodel-code-generator>=0.25.5",
     "psycopg2[binary]>=2.9.9",
     "psycopg[binary]>=3.1.18",
+    "rich>=13.7.1",
 ]
 
 [tool.hatch.metadata]

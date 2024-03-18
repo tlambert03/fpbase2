@@ -4,6 +4,8 @@ from pydantic import AnyUrl, BeforeValidator, PostgresDsn, computed_field
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+DBScheme = Literal["sqlite", "postgresql", "postgresql+psycopg"]
+
 
 def parse_cors(v: Any) -> list[str] | str:
     if isinstance(v, str) and not v.startswith("["):
@@ -45,9 +47,17 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str | None = None
     POSTGRES_DB: str = ""
 
+    DB_SQLITE_PATH: Literal[":memory:"] | str | None = None
+
     @computed_field  # type: ignore[misc]
     @property
-    def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
+    def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn | str:
+        # https://docs.sqlalchemy.org/en/20/core/engines.html#sqlite
+        if self.DB_SQLITE_PATH:
+            if self.DB_SQLITE_PATH == ":memory:":
+                return "sqlite://"
+            return f"sqlite:///{self.DB_SQLITE_PATH}"
+
         return MultiHostUrl.build(
             scheme="postgresql+psycopg",
             username=self.POSTGRES_USER,

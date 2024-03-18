@@ -65,14 +65,17 @@ def rebuild(
 ) -> None:
     """Recreate the database and tables."""
 
+    from sqlmodel import Session
+
     from fpbase2._dev._import import add_fpb_proteins, add_fpb_references, add_fpb_users
     from fpbase2.core.config import settings
-    # from fpbase2.core.db import init_db
+    from fpbase2.core.db import engine, init_db
 
     typer.echo(f"Rebuilding database... {settings.SQLALCHEMY_DATABASE_URI}")
-    if (uri := settings.SQLALCHEMY_DATABASE_URI) and uri.scheme == "sqlite":
-        Path(str(uri.path).lstrip("/")).unlink(missing_ok=True)
-        # init_db()
+    if settings.DB_SQLITE_PATH:
+        Path(settings.DB_SQLITE_PATH).unlink(missing_ok=True)
+        with Session(engine) as session:
+            init_db(session)
 
     add_fpb_users()
     add_fpb_references()
@@ -86,3 +89,7 @@ def check() -> None:
     """Run checks"""
     proc = subprocess.run(["pre-commit", "run", "--all-files"])  # noqa: S603, S607
     typer.Exit(proc.returncode)
+
+
+if __name__ == "__main__":
+    app()

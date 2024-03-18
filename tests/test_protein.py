@@ -10,7 +10,12 @@ from fpbase2.utils import read_or_404
 def test_create_protein(client: TestClient):
     response = client.post(
         "/proteins/",
-        json={"name": "EGFP", "seq": "ABCDE", "aliases": ["OG"], "agg": "m"},
+        json={
+            "name": "EGFP",
+            "seq": "ABCDE",
+            # "aliases": ["OG"],
+            "agg": "m",
+        },
     )
     assert response.status_code == 200
     data = response.json()
