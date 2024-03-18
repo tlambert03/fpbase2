@@ -1,6 +1,12 @@
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, Self
 
-from pydantic import AnyUrl, BeforeValidator, PostgresDsn, computed_field
+from pydantic import (
+    AnyUrl,
+    BeforeValidator,
+    PostgresDsn,
+    computed_field,
+    model_validator,
+)
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -41,13 +47,23 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "fpbase"
     DEBUG: bool = False
 
-    POSTGRES_SERVER: str
+    POSTGRES_SERVER: str | None = None
     POSTGRES_PORT: int = 5432
-    POSTGRES_USER: str
+    POSTGRES_USER: str | None = None
     POSTGRES_PASSWORD: str | None = None
     POSTGRES_DB: str = ""
 
     DB_SQLITE_PATH: Literal[":memory:"] | str | None = None
+
+    @model_validator(mode="after")
+    def _check_db_provided(self) -> Self:
+        if not self.DB_SQLITE_PATH:
+            if not self.POSTGRES_SERVER and self.POSTGRES_USER:
+                raise ValueError(
+                    "Either DB_SQLITE_PATH or POSTGRES_SERVER and POSTGRES_USER "
+                    "environment variables must be set"
+                )
+        return self
 
     @computed_field  # type: ignore[misc]
     @property
