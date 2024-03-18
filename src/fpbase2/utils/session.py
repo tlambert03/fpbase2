@@ -24,7 +24,7 @@ def create_object(session: Session, model: type[M], data: BaseModel) -> M:
     SQLModel
         The created instance of the model.
     """
-    db_obj = model.from_orm(data)
+    db_obj = model.model_validate(data)
     session.add(db_obj)
     session.commit()
     session.refresh(db_obj)

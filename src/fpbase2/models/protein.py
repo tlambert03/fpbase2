@@ -55,12 +55,12 @@ class ProteinBase(Authorable, TimeStampedModel):
     aliases: list[str] | None = Field(None, sa_column=Column(JSON))
     agg: OligomerizationTendency | None = None
     seq: str | None = None
-    seq_comment: str | None = Field(max_length=512)
+    seq_comment: str | None = Field(None, max_length=512)
     seq_validated: bool = False
     chromophore: str | None = Field(None, max_length=5)
     cofactor: FluorescenceCofactor | None = None
     switch_type: SwitchingType = SwitchingType.BASIC
-    blurb: str | None = Field(max_length=512)
+    blurb: str | None = Field(None, max_length=512)
     pdb: list[str] | None = Field(None, sa_column=Column(JSON))
     genbank: str | None = Field(None, max_length=12, **UNIQUE)
     uniprot: str | None = Field(None, max_length=10, regex=UNIPROT_REGEX, **UNIQUE)
@@ -98,15 +98,15 @@ class Protein(ProteinBase, table=True):
     slug: str | None = Field(default=None, **UNIQUE)
     seq_validated: bool = False
 
-    created_by_id: int | None = Field(
-        default=None, foreign_key="user.id", nullable=False
-    )
-    created_by: User | None = Relationship(back_populates="proteins")
+    # created_by_id: int | None = Field(
+    #     default=None, foreign_key="user.id", nullable=False
+    # )
+    # created_by: User | None = Relationship(back_populates="proteins")
     # updated_by_id: int | None = Field(
     #     default=None, foreign_key="user.id", nullable=False
     # )
     # updated_by: User | None = Relationship(back_populates="proteins_updated")
-    primary_reference: Reference | None = Relationship(back_populates="proteins")
+    # primary_reference: Reference | None = Relationship(back_populates="proteins")
 
     q: ClassVar[QueryDescriptor["Protein"]] = QueryDescriptor()
 

@@ -33,7 +33,7 @@ class UserBase(SQLModel):
 
 class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    proteins: list["Protein"] = Relationship(back_populates="created_by")
+    # proteins: list["Protein"] = Relationship(back_populates="created_by")
     # proteins_updated: list["Protein"] = Relationship(back_populates="updated_by")
 
     q: ClassVar[QueryDescriptor["User"]] = QueryDescriptor()

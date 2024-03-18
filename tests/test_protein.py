@@ -13,7 +13,7 @@ def test_create_protein(client: TestClient):
         json={
             "name": "EGFP",
             "seq": "ABCDE",
-            # "aliases": ["OG"],
+            "aliases": ["OG"],
             "agg": "m",
         },
     )
