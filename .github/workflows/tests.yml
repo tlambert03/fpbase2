@@ -28,7 +28,9 @@ jobs:
         uses: eifinger/setup-rye@v2
 
       - name: Install library
-        run: rye sync
+        run: |
+          rye config --set-bool behavior.use-uv=true
+          rye sync
 
       - name: Run tests
         run: rye run pytest --cov=fpbase2 --cov-report=xml --cov-report=term-missing
