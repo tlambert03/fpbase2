@@ -24,26 +24,13 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          virtualenvs-in-project: true
-
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-
-      - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
+      - name: Install rye
+        uses: eifinger/setup-rye@v2
 
       - name: Install library
-        run: poetry install --no-interaction
+        run: rye sync
 
       - name: Run tests
-        run: poetry run pytest --cov=fpbase2 --cov-report=xml --cov-report=term-missing
+        run: rye run pytest --cov=fpbase2 --cov-report=xml --cov-report=term-missing
 
       - uses: codecov/codecov-action@v3
