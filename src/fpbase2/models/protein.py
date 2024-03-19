@@ -89,7 +89,7 @@ class ProteinRead(ProteinBase):
 
 
 class ProteinUpdate(ProteinBase):
-    seq_validated: bool = False
+    pass
 
 
 class Protein(ProteinBase, table=True):
@@ -97,7 +97,6 @@ class Protein(ProteinBase, table=True):
     # TODO: allow_mutation = False
     uuid: str | None = Field(default=None, index=True, max_length=5, **UNIQUE)
     slug: str | None = Field(default=None, **UNIQUE)
-    seq_validated: bool = False
 
     # created_by_id: int | None = Field(
     #     default=None, foreign_key="user.id", nullable=False
