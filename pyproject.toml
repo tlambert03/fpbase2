@@ -5,7 +5,6 @@ description = "FPbase API client 2.0"
 authors = [{ name = "Talley Lambert", email = "talley.lambert@gmail.com" }]
 dependencies = [
     "fastapi~=0.110.0",
-    "requests~=2.31.0",
     "sqlmodel~=0.0.16",
     "uvicorn[standard]>=0.28.0",
     "pydantic[email]>=2.6.4",
@@ -72,7 +71,7 @@ select = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101"]
+"**/tests/*" = ["S101", "S31"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["fpbase2"]
@@ -98,8 +97,7 @@ disallow_incomplete_defs = false
 # https://docs.pytest.org/en/latest/customize.html
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = ["--cov=fpbase2", "--cov-report=term-missing"]
-testpaths = ["tests"]
+testpaths = ["src/fpbase2/tests"]
 filterwarnings = ["error"]
 
 # https://coverage.readthedocs.io/en/6.4/config.html

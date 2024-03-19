@@ -56,9 +56,9 @@ class QueryManager(Generic[M]):
     def __init__(self, model: type[M], engine: Engine | None = None) -> None:
         self._model = model
         if engine is None:
-            from fpbase2.db import _engine
+            from fpbase2.core import db
 
-            engine = _engine.engine
+            engine = db.engine
 
         if str(engine.url) not in _SESSIONS:
             _SESSIONS[str(engine.url)] = Session(engine)
@@ -139,11 +139,12 @@ class QueryManager(Generic[M]):
                 )
         return obj
 
-    def create(self, **kwargs: Any) -> M:
-        db_obj = self._model(**kwargs)
-        self.session.add(db_obj)
-        self.session.commit()
-        self.session.refresh(db_obj)
+    def create(self, session: Session | None = None, **kwargs: Any) -> M:
+        db_obj = self._model.model_validate(kwargs)
+        session = session or self.session
+        session.add(db_obj)
+        session.commit()
+        session.refresh(db_obj)
         return db_obj
 
 

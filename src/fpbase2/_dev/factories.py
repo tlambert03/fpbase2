@@ -14,7 +14,7 @@ def n_random_letters(n: int) -> str:
     return "".join(secrets.choice(AA_LETTERS) for _ in range(n))
 
 
-class ProteinFactory(ModelFactory):
+class ProteinFactory(ModelFactory[Protein]):
     __model__ = Protein
 
     name: str = fake.first_name

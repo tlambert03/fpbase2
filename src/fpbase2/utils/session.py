@@ -86,7 +86,7 @@ def update_object(
     """
     db_obj = read_or_404(session, model, ident, **kwargs)
 
-    for key, value in update_data.dict(exclude_unset=True).items():
+    for key, value in update_data.model_dump(exclude_unset=True).items():
         setattr(db_obj, key, value)
 
     session.add(db_obj)

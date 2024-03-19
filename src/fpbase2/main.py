@@ -73,7 +73,7 @@ def read_protein(*, session: SessionDep, protein_id: int) -> Protein:
     return read_or_404(session, Protein, protein_id)
 
 
-@app.patch(URL.PROTEIN, response_model=ProteinRead)
+@app.put(URL.PROTEIN, response_model=ProteinRead)
 def update_protein(
     *, session: SessionDep, protein_id: int, protein: ProteinUpdate
 ) -> Protein:

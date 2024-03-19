@@ -25,11 +25,8 @@ black==24.3.0
 certifi==2024.2.2
     # via httpcore
     # via httpx
-    # via requests
 cfgv==3.4.0
     # via pre-commit
-charset-normalizer==3.3.2
-    # via requests
 click==8.1.7
     # via black
     # via typer
@@ -72,7 +69,6 @@ idna==3.6
     # via anyio
     # via email-validator
     # via httpx
-    # via requests
 inflect==5.6.2
     # via datamodel-code-generator
 iniconfig==2.0.0
@@ -155,8 +151,6 @@ pyyaml==6.0.1
     # via datamodel-code-generator
     # via pre-commit
     # via uvicorn
-requests==2.31.0
-    # via fpbase2
 rich==13.7.1
 ruff==0.3.3
 setuptools==69.2.0
@@ -191,7 +185,6 @@ typing-extensions==4.10.0
     # via sqlalchemy
     # via typer
 urllib3==2.2.1
-    # via requests
     # via types-requests
 uvicorn==0.28.0
     # via fpbase2

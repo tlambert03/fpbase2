@@ -75,6 +75,9 @@ class ProteinBase(Authorable, TimeStampedModel):
     # status
     # status_changed
 
+    def slugified_name(self) -> str:
+        return slugify(self.name)
+
 
 class ProteinCreate(ProteinBase):
     pass
@@ -115,4 +118,4 @@ class Protein(ProteinBase, table=True):
         if self.uuid is None:
             result = conn.execute(text("SELECT uuid FROM protein"))
             self.uuid = new_id(existing={i[0] for i in result if i[0]})
-        self.slug = slugify(self.name)
+        self.slug = self.slugified_name()

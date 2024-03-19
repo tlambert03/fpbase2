@@ -6,11 +6,12 @@ from sqlmodel import Session, SQLModel, create_engine, text
 from fpbase2.core import db
 from fpbase2.models.protein import Protein
 from fpbase2.models.reference import Author, Reference
+
 # from fpbase2.models.reference import Author, AuthorReferenceLink, Reference
 from fpbase2.models.user import User
 from fpbase2.utils import crossref_work
 
-URL = "postgresql:///fpbase"
+URL = "postgresql+psycopg:///fpbase"
 fpb_engine = create_engine(URL, echo=True)
 
 M = TypeVar("M", bound=SQLModel)

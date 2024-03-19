@@ -43,7 +43,7 @@ def shell() -> None:
         "from fpbase2.core.config import settings",
         "from fpbase2._dev import *",
         "from fpbase2._dev._import import *",
-        "from fpbase2._dev._factories import *",
+        # "from fpbase2._dev._factories import *",
         "from fpbase2.utils import *",
         "from rich import print",
         "from rich import pretty; pretty.install()",

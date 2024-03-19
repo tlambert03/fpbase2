@@ -2,7 +2,6 @@ from datetime import datetime
 from functools import lru_cache
 from typing import Literal
 
-import requests
 from pydantic import BaseModel, Field
 
 API_BASE = "https://api.crossref.org"
@@ -11,14 +10,16 @@ MAIL_TO = "talley.lambert+fpbase@gmail.org"
 
 @lru_cache
 def crossref_work(doi: str) -> "Work":
+    import httpx
+
     from fpbase2 import __version__
 
     url = f"{API_BASE}/works/{doi}"
-    ua = f"python-requests/{requests.__version__}"
+    ua = f"python-httpx/{httpx.__version__}"
     ua += f" FPBase/{__version__} (https://fpbase.org/ mailto:{MAIL_TO})"
-    r = requests.get(url, headers={"User-Agent": ua, "X-USER-AGENT": ua}, timeout=10)
+    r = httpx.get(url, headers={"User-Agent": ua, "X-USER-AGENT": ua}, timeout=10)
     r.raise_for_status()
-    return Work.parse_obj(r.json()["message"])
+    return Work.model_validate(r.json()["message"])
 
 
 class Reference(BaseModel):
