@@ -1,10 +1,5 @@
-from fastapi import HTTPException
 from fastapi.testclient import TestClient
-import pytest
 from sqlmodel import Session
-
-from fpbase2.models.protein import Protein
-from fpbase2.utils.session import read_or_404
 
 from .utils.protein import ProteinFactory, create_random_protein
 from .utils.utils import n_random_aa, n_random_letters

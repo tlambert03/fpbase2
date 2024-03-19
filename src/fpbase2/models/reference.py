@@ -1,16 +1,13 @@
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, ClassVar, Optional
+from typing import ClassVar
 
-from sqlmodel import Field, Relationship, SQLModel, UniqueConstraint
+from sqlmodel import Field, SQLModel, UniqueConstraint
 
 from fpbase2.core._query import QueryDescriptor
 from fpbase2.validators import DOI_REGEX
 
 from .mixins import Authorable, TimeStampedModel
-
-if TYPE_CHECKING:
-    from .protein import Protein
 
 
 class AuthorSequence(str, Enum):
@@ -19,14 +16,14 @@ class AuthorSequence(str, Enum):
 
 
 # class AuthorReferenceLink(SQLModel, table=True):
-    # author_id: int | None = Field(None, foreign_key="author.id", primary_key=True)
-    # reference_id: int | None = Field(None, foreign_key="reference.id", primary_key=True)
-    # author_idx: int = Field(ge=0)
-    # author_sequence: AuthorSequence | None = None
+# author_id: int | None = Field(None, foreign_key="author.id", primary_key=True)
+# reference_id: int | None = Field(None, foreign_key="reference.id", primary_key=True)
+# author_idx: int = Field(ge=0)
+# author_sequence: AuthorSequence | None = None
 
-    # author: "Author" = Relationship(back_populates="reference_links")
-    # reference: "Reference" = Relationship(back_populates="author_links")
-    # q: ClassVar[QueryDescriptor["AuthorReferenceLink"]] = QueryDescriptor()
+# author: "Author" = Relationship(back_populates="reference_links")
+# reference: "Reference" = Relationship(back_populates="author_links")
+# q: ClassVar[QueryDescriptor["AuthorReferenceLink"]] = QueryDescriptor()
 
 
 class AuthorBase(TimeStampedModel):
