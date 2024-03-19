@@ -7,7 +7,7 @@ from sqlmodel import Field, SQLModel, UniqueConstraint
 from fpbase2.core._query import QueryDescriptor
 from fpbase2.validators import DOI_REGEX
 
-from .mixins import Authorable, TimeStampedModel
+from .mixins import TimeStampedModel
 
 
 class AuthorSequence(str, Enum):
@@ -53,7 +53,7 @@ class AuthorRead(AuthorBase):
     id: int
 
 
-class ReferenceBase(Authorable, TimeStampedModel):
+class ReferenceBase(TimeStampedModel):
     # TODO: fix doi regex validation
     doi: str = Field(sa_column_kwargs={"unique": True})
     pmid: str | None = Field(None, max_length=50, sa_column_kwargs={"unique": True})

@@ -31,12 +31,3 @@ class TimeStampedModel(SQLModel):
     def __repr_args__(self) -> Sequence[tuple[str | None, Any]]:
         args = super().__repr_args__()
         return [i for i in args if i[0] not in TimeStampedModel.model_fields]
-
-
-class Authorable(SQLModel):
-    created_by_id: int | None = Field(default=None, foreign_key="user.id")
-    updated_by_id: int | None = Field(default=None, foreign_key="user.id")
-
-    def __repr_args__(self) -> Sequence[tuple[str | None, Any]]:
-        args = super().__repr_args__()
-        return [i for i in args if i[0] not in Authorable.__dict__]

@@ -1,14 +1,15 @@
 from enum import Enum
 from typing import TYPE_CHECKING, Any, ClassVar
 
-from sqlmodel import JSON, Column, Field, text
+from sqlmodel import JSON, Column, Field, Relationship, text
 
 from fpbase2._typed_sa import on_before_save
 from fpbase2.core._query import QueryDescriptor
 from fpbase2.utils.text import new_id, slugify
 from fpbase2.validators import UNIPROT_REGEX
 
-from .mixins import Authorable, TimeStampedModel
+from .mixins import TimeStampedModel
+from .user import User
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import Connection
@@ -48,7 +49,7 @@ class SwitchingType(str, Enum):
     OTHER = "o"
 
 
-class ProteinBase(Authorable, TimeStampedModel):
+class ProteinBase(TimeStampedModel):
     name: str = Field(index=True, max_length=128)
     aliases: list[str] | None = Field(None, sa_column=Column(JSON))
     agg: OligomerizationTendency | None = None
@@ -98,14 +99,18 @@ class Protein(ProteinBase, table=True):
     uuid: str | None = Field(default=None, index=True, max_length=5, **UNIQUE)
     slug: str | None = Field(default=None, **UNIQUE)
 
-    # created_by_id: int | None = Field(
-    #     default=None, foreign_key="user.id", nullable=False
-    # )
-    # created_by: User | None = Relationship(back_populates="proteins")
-    # updated_by_id: int | None = Field(
-    #     default=None, foreign_key="user.id", nullable=False
-    # )
-    # updated_by: User | None = Relationship(back_populates="proteins_updated")
+    created_by_id: int | None = Field(default=None, foreign_key="user.id")
+    created_by: User | None = Relationship(
+        back_populates="proteins_created",
+        sa_relationship_kwargs={"foreign_keys": "[Protein.created_by_id]"},
+    )
+
+    updated_by_id: int | None = Field(default=None, foreign_key="user.id")
+    updated_by: User | None = Relationship(
+        back_populates="proteins_updated",
+        sa_relationship_kwargs={"foreign_keys": "[Protein.updated_by_id]"},
+    )
+
     # primary_reference: Reference | None = Relationship(back_populates="proteins")
 
     q: ClassVar[QueryDescriptor["Protein"]] = QueryDescriptor()
