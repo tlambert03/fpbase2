@@ -5,10 +5,10 @@ description = "FPbase API client 2.0"
 authors = [{ name = "Talley Lambert", email = "talley.lambert@gmail.com" }]
 dependencies = [
     "fastapi~=0.110.0",
+    "pydantic-settings>=2.2.1",
+    "pydantic[email]>=2.6.4",
     "sqlmodel~=0.0.16",
     "uvicorn[standard]>=0.28.0",
-    "pydantic[email]>=2.6.4",
-    "pydantic-settings>=2.2.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
@@ -23,23 +23,20 @@ build-backend = "hatchling.build"
 [tool.rye]
 managed = true
 dev-dependencies = [
-    "python-dotenv>=1.0.1",
-    "black>=24.3.0",
+    "datamodel-code-generator>=0.25.5",
+    "httpx~=0.25.1",
     "ipython>=8.22.2",
+    "mypy>=1.9.0",
     "pdbpp>=0.10.3",
+    "polyfactory>=2.15.0",
     "pre-commit>=3.6.2",
-    "pydantic-factories>=1.17.3",
-    "pytest>=8.1.1",
+    "psycopg[binary]>=3.1.18",
     "pytest-cov>=4.1.0",
+    "pytest>=8.1.1",
+    "python-dotenv>=1.0.1",
+    "rich>=13.7.1",
     "ruff>=0.3.3",
     "typer>=0.9.0",
-    "types-requests>=2.31.0.20240311",
-    "mypy>=1.9.0",
-    "httpx~=0.25.1",
-    "datamodel-code-generator>=0.25.5",
-    "psycopg[binary]>=3.1.18",
-    "rich>=13.7.1",
-    "polyfactory>=2.15.0",
 ]
 
 [tool.hatch.metadata]

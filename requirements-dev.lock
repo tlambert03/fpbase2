@@ -44,9 +44,8 @@ email-validator==2.1.1
     # via pydantic
 executing==2.0.1
     # via stack-data
-faker==24.2.0
+faker==24.3.0
     # via polyfactory
-    # via pydantic-factories
 fancycompleter==0.9.1
     # via pdbpp
 fastapi==0.110.0
@@ -125,12 +124,10 @@ pydantic==2.6.4
     # via datamodel-code-generator
     # via fastapi
     # via fpbase2
-    # via pydantic-factories
     # via pydantic-settings
     # via sqlmodel
 pydantic-core==2.16.3
     # via pydantic
-pydantic-factories==1.17.3
 pydantic-settings==2.2.1
     # via fpbase2
 pygments==2.17.2
@@ -173,7 +170,6 @@ traitlets==5.14.2
     # via ipython
     # via matplotlib-inline
 typer==0.9.0
-types-requests==2.31.0.20240311
 typing-extensions==4.10.0
     # via fastapi
     # via mypy
@@ -181,11 +177,8 @@ typing-extensions==4.10.0
     # via psycopg
     # via pydantic
     # via pydantic-core
-    # via pydantic-factories
     # via sqlalchemy
     # via typer
-urllib3==2.2.1
-    # via types-requests
 uvicorn==0.28.0
     # via fpbase2
 uvloop==0.19.0
