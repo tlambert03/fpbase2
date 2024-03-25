@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Any, ClassVar
 from sqlmodel import JSON, Column, Field, Relationship, text
 
 from fpbase2._typed_sa import on_before_save
-from fpbase2.core._query import QueryDescriptor
 from fpbase2.utils.text import new_id, slugify
 from fpbase2.validators import UNIPROT_REGEX
 
@@ -61,9 +60,11 @@ class ProteinBase(TimeStampedModel):
     switch_type: SwitchingType = SwitchingType.BASIC
     blurb: str | None = Field(None, max_length=512)
     pdb: list[str] | None = Field(None, sa_column=Column(JSON))
-    genbank: str | None = Field(None, max_length=12, **UNIQUE)
-    uniprot: str | None = Field(None, max_length=10, regex=UNIPROT_REGEX, **UNIQUE)
-    ipg_id: str | None = Field(None, max_length=12, **UNIQUE)
+    genbank: str | None = Field(None, min_length=8, max_length=12, **UNIQUE)
+    uniprot: str | None = Field(
+        None, min_length=6, max_length=10, regex=UNIPROT_REGEX, **UNIQUE
+    )
+    ipg_id: str | None = Field(None, min_length=8, max_length=12, **UNIQUE)
 
     primary_reference_id: int | None = Field(default=None, foreign_key="reference.id")
     # oser
@@ -112,8 +113,6 @@ class Protein(ProteinBase, table=True):
     )
 
     # primary_reference: Reference | None = Relationship(back_populates="proteins")
-
-    q: ClassVar[QueryDescriptor["Protein"]] = QueryDescriptor()
 
     @on_before_save
     def _on_before_save(self, _: Any, conn: "Connection") -> None:

@@ -1,16 +1,16 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING
 
-from sqlmodel import Field, Relationship, SQLModel, text
+from sqlmodel import Field, Relationship, text
 
-from fpbase2.core._query import QueryDescriptor
+from .mixins import FPBaseModel
 
 if TYPE_CHECKING:
     from .protein import Protein
 # TODO replace email str with EmailStr when sqlmodel supports it
 
 
-class UserBase(SQLModel):
+class UserBase(FPBaseModel):
     username: str = Field(index=True, max_length=150, sa_column_kwargs={"unique": True})
     password: str
     first_name: str | None = None
@@ -47,4 +47,3 @@ class User(UserBase, table=True):
         },
     )
 
-    q: ClassVar[QueryDescriptor["User"]] = QueryDescriptor()

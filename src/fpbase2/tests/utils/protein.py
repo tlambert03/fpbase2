@@ -21,6 +21,7 @@ class ProteinFactory(ModelFactory[ProteinCreate]):
         return cls.__faker__.unique.first_name()  # type: ignore
 
 
+
 def create_random_protein(db: Session) -> Protein:
     protein = ProteinFactory.build()
     return crud.create_protein(session=db, protein_in=protein)

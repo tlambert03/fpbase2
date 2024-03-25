@@ -1,13 +1,11 @@
 from datetime import datetime
 from enum import Enum
-from typing import ClassVar
 
 from sqlmodel import Field, SQLModel, UniqueConstraint
 
-from fpbase2.core._query import QueryDescriptor
 from fpbase2.validators import DOI_REGEX
 
-from .mixins import TimeStampedModel
+from .mixins import TimeStampedModel, FPBaseModel
 
 
 class AuthorSequence(str, Enum):
@@ -23,7 +21,6 @@ class AuthorSequence(str, Enum):
 
 # author: "Author" = Relationship(back_populates="reference_links")
 # reference: "Reference" = Relationship(back_populates="author_links")
-# q: ClassVar[QueryDescriptor["AuthorReferenceLink"]] = QueryDescriptor()
 
 
 class AuthorBase(TimeStampedModel):
@@ -78,10 +75,8 @@ class Reference(ReferenceBase, table=True):
     # )
     # author_links: list[AuthorReferenceLink] = Relationship(back_populates="reference")
 
-    q: ClassVar[QueryDescriptor["Reference"]] = QueryDescriptor()
 
-
-class ReferenceCreate(SQLModel):
+class ReferenceCreate(FPBaseModel):
     doi: str = Field(..., regex=DOI_REGEX, sa_column_kwargs={"unique": True})
     pmid: str | None = Field(None, max_length=50)
 

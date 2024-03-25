@@ -2,17 +2,26 @@ import datetime
 from collections.abc import Sequence
 from typing import Any
 
-from sqlalchemy import text
-from sqlmodel import Field
-
-from fpbase2._vendored import SQLModel
+from sqlalchemy import orm, text
+from sqlmodel import Field, SQLModel
 
 
 def _now() -> datetime.datetime:
     return datetime.datetime.now(datetime.UTC)
 
 
-class TimeStampedModel(SQLModel):
+class FPBaseModel(SQLModel):
+    @orm.declared_attr  # type: ignore
+    def __tablename__(cls) -> str:
+        from fpbase2.core.config import settings
+
+        name = cls.__name__.lower()
+        if str(settings.SQLALCHEMY_DATABASE_URI).endswith("/fpbase"):
+            name = f"proteins_{name}"
+        return name
+
+
+class TimeStampedModel(FPBaseModel):
     created: datetime.datetime = Field(
         default_factory=_now,
         nullable=False,
