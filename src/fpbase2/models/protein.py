@@ -1,13 +1,13 @@
 from enum import Enum
 from typing import TYPE_CHECKING, Any, ClassVar
 
-from sqlmodel import JSON, Column, Field, Relationship, text
+from sqlmodel import JSON, Column, Field, Relationship, SQLModel, text
 
 from fpbase2._typed_sa import on_before_save
 from fpbase2.utils.text import new_id, slugify
 from fpbase2.validators import UNIPROT_REGEX
 
-from .mixins import TimeStampedModel
+from ._base import TimeStampedModel
 from .user import User
 
 if TYPE_CHECKING:
@@ -48,7 +48,7 @@ class SwitchingType(str, Enum):
     OTHER = "o"
 
 
-class ProteinBase(TimeStampedModel):
+class ProteinBase(SQLModel):
     name: str = Field(index=True, max_length=128)
     aliases: list[str] | None = Field(None, sa_column=Column(JSON))
     agg: OligomerizationTendency | None = None
@@ -75,6 +75,8 @@ class ProteinBase(TimeStampedModel):
     # status
     # status_changed
 
+    SwitchingType: ClassVar = SwitchingType
+
     def slugified_name(self) -> str:
         return slugify(self.name)
 
@@ -94,7 +96,7 @@ class ProteinUpdate(ProteinBase):
     pass
 
 
-class Protein(ProteinBase, table=True):
+class Protein(ProteinBase, TimeStampedModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     # TODO: allow_mutation = False
     uuid: str | None = Field(default=None, index=True, max_length=5, **UNIQUE)

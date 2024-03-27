@@ -5,9 +5,7 @@ from sqlmodel import Session, SQLModel, create_engine, text
 
 from fpbase2.core import db
 from fpbase2.models.protein import Protein
-from fpbase2.models.reference import Author, Reference
-
-# from fpbase2.models.reference import Author, AuthorReferenceLink, Reference
+from fpbase2.models.reference import Author, AuthorReferenceLink, Reference
 from fpbase2.models.user import User
 from fpbase2.utils import crossref_work
 
@@ -63,12 +61,16 @@ def add_fpb_references(n: int = 10) -> None:
             _db_authors: list[tuple[Author, str]] = []
             for author in work.author:
                 # create an fpbase2 author object
-                db_author = Author.q.where(  # type: ignore
+                db_author = session.get(
+                    Author,
+                    (Author.given == author.given) & (Author.family == author.family),
+                )
+                db_author = Author.objects.where(
                     (Author.given == author.given) & (Author.family == author.family),
                     limit=1,
                 )
                 if not db_author:
-                    db_author = Author.parse_obj(author)
+                    db_author = Author.model_validate(author)
                     session.add(db_author)
                 _db_authors.append((db_author, author.sequence))  # type: ignore
             session.add(db_ref)

@@ -15,7 +15,7 @@ then:
 git clone https://github.com/tlambert03/fpbase2.git
 cd fpbase2
 rye sync
-rye run pytest
+rye test
 ```
 
 (You can also use `source .venv/bin/activate` to activate the virtual environment,

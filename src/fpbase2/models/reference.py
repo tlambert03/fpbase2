@@ -1,11 +1,11 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlmodel import Field, SQLModel, UniqueConstraint
+from sqlmodel import Field, UniqueConstraint
 
 from fpbase2.validators import DOI_REGEX
 
-from .mixins import TimeStampedModel, FPBaseModel
+from ._base import FPBaseModel, TimeStampedModel
 
 
 class AuthorSequence(str, Enum):
@@ -13,14 +13,14 @@ class AuthorSequence(str, Enum):
     ADDITIONAL = "additional"
 
 
-# class AuthorReferenceLink(SQLModel, table=True):
-# author_id: int | None = Field(None, foreign_key="author.id", primary_key=True)
-# reference_id: int | None = Field(None, foreign_key="reference.id", primary_key=True)
-# author_idx: int = Field(ge=0)
-# author_sequence: AuthorSequence | None = None
+class AuthorReferenceLink(FPBaseModel, table=True):
+    author_id: int | None = Field(None, foreign_key="author.id", primary_key=True)
+    reference_id: int | None = Field(None, foreign_key="reference.id", primary_key=True)
+    author_idx: int = Field(ge=0)
+    author_sequence: AuthorSequence | None = None
 
-# author: "Author" = Relationship(back_populates="reference_links")
-# reference: "Reference" = Relationship(back_populates="author_links")
+    # author: "Author" = Relationship(back_populates="reference_links")
+    # reference: "Reference" = Relationship(back_populates="author_links")
 
 
 class AuthorBase(TimeStampedModel):

@@ -38,6 +38,7 @@ def shell() -> None:
     c = Config()
     c.InteractiveShellApp.exec_lines = [
         "from sqlmodel import *",
+        "from fpbase2.models._base import CRUDMixin",
         "from fpbase2.models.protein import *",
         "from fpbase2.core.db import *",
         "from fpbase2.core.config import settings",
@@ -49,6 +50,8 @@ def shell() -> None:
         "from rich import pretty; pretty.install()",
         "session = Session(engine)",
         "init_db(session)",
+        "CRUDMixin._session = session",
+        "",
     ]
 
     c.InteractiveShell.colors = "Neutral"

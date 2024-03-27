@@ -89,4 +89,4 @@ class Settings(BaseSettings):
     ALLOW_QM: bool = False
 
 
-settings = Settings()  # type: ignore[call-arg]
+settings = Settings()

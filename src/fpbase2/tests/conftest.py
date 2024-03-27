@@ -13,7 +13,7 @@ from fpbase2.core.db import engine, init_db  # noqa: E402
 from fpbase2.main import app  # noqa: E402
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session", autouse=True)  # type: ignore
 def db() -> Generator[Session, None, None]:
     """Create a database engine for testing, and connect a session to it."""
     with Session(engine) as session:
@@ -31,7 +31,7 @@ def db() -> Generator[Session, None, None]:
 #         transaction.close()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module")  # type: ignore
 def client() -> Generator[TestClient, None, None]:
     with TestClient(app) as c:
         yield c

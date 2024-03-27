@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, text
 
-from .mixins import FPBaseModel
+from ._base import FPBaseModel
 
 if TYPE_CHECKING:
     from .protein import Protein
@@ -46,4 +46,3 @@ class User(UserBase, table=True):
             "lazy": "joined",
         },
     )
-

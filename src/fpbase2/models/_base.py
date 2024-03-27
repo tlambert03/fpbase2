@@ -1,9 +1,13 @@
 import datetime
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, ClassVar, Self, TypeVar
 
 from sqlalchemy import orm, text
 from sqlmodel import Field, SQLModel
+
+from ._manager import Manager
+
+M = TypeVar("M", bound=SQLModel)
 
 
 def _now() -> datetime.datetime:
@@ -19,6 +23,8 @@ class FPBaseModel(SQLModel):
         if str(settings.SQLALCHEMY_DATABASE_URI).endswith("/fpbase"):
             name = f"proteins_{name}"
         return name
+
+    objects: ClassVar[Manager[Self]] = Manager()
 
 
 class TimeStampedModel(FPBaseModel):
