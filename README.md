@@ -8,17 +8,17 @@ A rewrite of the FPbase backend, using
 
 ## Installation
 
-[install poetry](https://python-poetry.org/docs/#installation) (if you don't already have it),
+[install rye](https://github.com/astral-sh/rye) (if you don't already have it),
 then:
 
 ```bash
 git clone https://github.com/tlambert03/fpbase2.git
 cd fpbase2
-poetry install
-poetry run pytest
+rye sync
+rye test
 ```
 
-(You can also use `poetry shell` to activate the virtual environment,
+(You can also use `source .venv/bin/activate` to activate the virtual environment,
 and then run `pytest` directly)
 
 ## Usage
