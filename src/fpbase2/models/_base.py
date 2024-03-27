@@ -26,6 +26,21 @@ class FPBaseModel(SQLModel):
 
     objects: ClassVar[Manager[Self]] = Manager()
 
+    def save(self) -> Self:
+        session = type(self).objects._session
+        session.add(self)
+        session.commit()
+        session.refresh(self)
+        return self
+
+    def delete(self) -> None:
+        session = type(self).objects._session
+        session.delete(self)
+        session.commit()
+
+    # def exists(self) -> bool: ...
+    # def update(self, **kwargs: Any) -> Self: ...
+
 
 class TimeStampedModel(FPBaseModel):
     created: datetime.datetime = Field(

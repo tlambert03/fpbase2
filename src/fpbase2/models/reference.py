@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlmodel import Field, UniqueConstraint
+from sqlmodel import Field, Relationship, UniqueConstraint
 
 from fpbase2.validators import DOI_REGEX
 
@@ -33,9 +33,9 @@ class Author(AuthorBase, table=True):
     __table_args__ = (UniqueConstraint("family", "given", name="_family_given_uc"),)
     id: int | None = Field(default=None, primary_key=True)
 
-    # references: list["Reference"] = Relationship(
-    #     back_populates="authors", link_model=AuthorReferenceLink
-    # )
+    references: list["Reference"] = Relationship(
+        back_populates="authors", link_model=AuthorReferenceLink
+    )
     # reference_links: list[AuthorReferenceLink] = Relationship(back_populates="author")
 
 
@@ -68,11 +68,11 @@ class ReferenceBase(TimeStampedModel):
 
 class Reference(ReferenceBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    # proteins: Optional["Protein"] = Relationship(back_populates="primary_reference")
+    # proteins: "Protein | None" = Relationship(back_populates="primary_reference")
 
-    # authors: list[Author] = Relationship(
-    #     back_populates="references", link_model=AuthorReferenceLink
-    # )
+    authors: list[Author] = Relationship(
+        back_populates="references", link_model=AuthorReferenceLink
+    )
     # author_links: list[AuthorReferenceLink] = Relationship(back_populates="reference")
 
 

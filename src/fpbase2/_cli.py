@@ -38,20 +38,18 @@ def shell() -> None:
     c = Config()
     c.InteractiveShellApp.exec_lines = [
         "from sqlmodel import *",
-        "from fpbase2.models._base import CRUDMixin",
         "from fpbase2.models.protein import *",
+        "from fpbase2.models._manager import Manager",
         "from fpbase2.core.db import *",
         "from fpbase2.core.config import settings",
         "from fpbase2._dev import *",
         "from fpbase2._dev._import import *",
-        # "from fpbase2._dev._factories import *",
         "from fpbase2.utils import *",
         "from rich import print",
         "from rich import pretty; pretty.install()",
         "session = Session(engine)",
         "init_db(session)",
-        "CRUDMixin._session = session",
-        "",
+        "Manager.set_session(session)",
     ]
 
     c.InteractiveShell.colors = "Neutral"
@@ -63,7 +61,7 @@ def shell() -> None:
 @app.command()
 def rebuild(
     start_shell: bool = typer.Option(
-        True, "--shell/--no-shell", help="Start ipython shell after rebuild."
+        False, "--shell/--no-shell", help="Start ipython shell after rebuild."
     ),
 ) -> None:
     """Recreate the database and tables."""
@@ -73,16 +71,18 @@ def rebuild(
     from fpbase2._dev._import import add_fpb_proteins, add_fpb_references, add_fpb_users
     from fpbase2.core.config import settings
     from fpbase2.core.db import engine, init_db
+    from fpbase2.models._manager import Manager
 
     typer.echo(f"Rebuilding database... {settings.SQLALCHEMY_DATABASE_URI}")
     if settings.DB_SQLITE_PATH:
         Path(settings.DB_SQLITE_PATH).unlink(missing_ok=True)
         with Session(engine) as session:
             init_db(session)
+            Manager.set_session(session)
+            add_fpb_users()
+            add_fpb_references()
+            add_fpb_proteins()
 
-    add_fpb_users()
-    add_fpb_references()
-    add_fpb_proteins()
     if start_shell:
         shell()
 

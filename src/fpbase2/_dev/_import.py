@@ -61,10 +61,6 @@ def add_fpb_references(n: int = 10) -> None:
             _db_authors: list[tuple[Author, str]] = []
             for author in work.author:
                 # create an fpbase2 author object
-                db_author = session.get(
-                    Author,
-                    (Author.given == author.given) & (Author.family == author.family),
-                )
                 db_author = Author.objects.where(
                     (Author.given == author.given) & (Author.family == author.family),
                     limit=1,

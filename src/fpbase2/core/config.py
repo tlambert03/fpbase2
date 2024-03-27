@@ -65,6 +65,10 @@ class Settings(BaseSettings):
             if self.DB_SQLITE_PATH == ":memory:":
                 return "sqlite://"
             return f"sqlite:///{self.DB_SQLITE_PATH}"
+        if not (self.POSTGRES_SERVER and self.POSTGRES_DB):
+            raise ValueError(
+                "Must set either DB_SQLITE_PATH or POSTGRES_SERVER and POSTGRES_DB"
+            )
 
         return MultiHostUrl.build(
             scheme="postgresql+psycopg",
