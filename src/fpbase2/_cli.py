@@ -42,8 +42,8 @@ def shell() -> None:
         "from fpbase2.models._manager import Manager",
         "from fpbase2.core.db import *",
         "from fpbase2.core.config import settings",
-        "from fpbase2._dev import *",
-        "from fpbase2._dev._import import *",
+        "from _dev import *",
+        "from _dev._import import *",
         "from fpbase2.utils import *",
         "from rich import print",
         "from rich import pretty; pretty.install()",
@@ -66,9 +66,9 @@ def rebuild(
 ) -> None:
     """Recreate the database and tables."""
 
+    from _dev._import import add_fpb_proteins, add_fpb_references, add_fpb_users
     from sqlmodel import Session
 
-    from fpbase2._dev._import import add_fpb_proteins, add_fpb_references, add_fpb_users
     from fpbase2.core.config import settings
     from fpbase2.core.db import engine, init_db
     from fpbase2.models._manager import Manager
