@@ -1,10 +1,10 @@
 from enum import Enum
 from typing import TYPE_CHECKING, Any, ClassVar
 
-from sqlmodel import JSON, Column, Field, Relationship, SQLModel, text
+from sqlmodel import JSON, Column, Field, Relationship, SQLModel
 
 from fpbase2._typed_sa import on_before_save
-from fpbase2.utils.text import new_id, slugify
+from fpbase2.utils.text import new_unique_id, slugify
 from fpbase2.validators import UNIPROT_REGEX
 
 from ._base import TimeStampedModel
@@ -119,6 +119,5 @@ class Protein(ProteinBase, TimeStampedModel, table=True):
     @on_before_save
     def _on_before_save(self, _: Any, conn: "Connection") -> None:
         if self.uuid is None:
-            result = conn.execute(text("SELECT uuid FROM protein"))
-            self.uuid = new_id(existing={i[0] for i in result if i[0]})
+            self.uuid = new_unique_id(conn)
         self.slug = self.slugified_name()

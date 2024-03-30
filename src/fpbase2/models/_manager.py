@@ -169,10 +169,14 @@ class QueryManager(Generic[M]):
             return obj
         return self.create(**kwargs)
 
-    def create(self, **kwargs: Any) -> M:
-        db_obj = self._model.model_validate(kwargs)
+    def create(self, obj: Any | None = None, **kwargs: Any) -> M:
+        db_obj = self._model.model_validate(obj or kwargs)
         self._session.add(db_obj)
-        self._session.commit()
+        try:
+            self._session.commit()
+        except Exception:
+            self._session.rollback()
+            raise
         self._session.refresh(db_obj)
         return db_obj
 

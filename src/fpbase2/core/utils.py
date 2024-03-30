@@ -46,6 +46,7 @@ def can_modify_database(statement: str) -> bool:
 def make_engine_read_only(engine: Engine) -> None:
     """Make an SQLAlchemy engine read-only."""
     from sqlalchemy import event
+    from sqlalchemy.exc import StatementError
 
     @event.listens_for(engine, "before_cursor_execute", retval=False)
     def before_cursor_execute(
@@ -53,4 +54,6 @@ def make_engine_read_only(engine: Engine) -> None:
     ) -> None:
         if can_modify_database(statement):
             # Raise an exception if the statement is modifying the database
-            raise RuntimeError(f"Database is read-only. Cannot execute: {statement}")
+            raise StatementError(
+                "Database is read-only. Cannot execute.", statement, parameters, None
+            )

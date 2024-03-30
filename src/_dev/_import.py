@@ -5,7 +5,7 @@ from sqlmodel import Session, SQLModel, create_engine, text
 
 from fpbase2.core import db
 from fpbase2.models.protein import Protein
-from fpbase2.models.reference import Author, AuthorReferenceLink, Reference
+from fpbase2.models.reference import Author, Reference, ReferenceAuthorLink
 from fpbase2.models.user import User
 from fpbase2.utils import crossref_work
 
@@ -74,7 +74,7 @@ def add_fpb_references(n: int = 10) -> None:
 
             for i, (db_author, seq) in enumerate(_db_authors):
                 # create a link table object
-                link = AuthorReferenceLink(
+                link = ReferenceAuthorLink(
                     author_id=db_author.id,
                     reference_id=db_ref.id,
                     author_idx=i,

@@ -13,7 +13,7 @@ class AuthorSequence(str, Enum):
     ADDITIONAL = "additional"
 
 
-class AuthorReferenceLink(FPBaseModel, table=True):
+class ReferenceAuthorLink(FPBaseModel, table=True):
     author_id: int | None = Field(None, foreign_key="author.id", primary_key=True)
     reference_id: int | None = Field(None, foreign_key="reference.id", primary_key=True)
     author_idx: int = Field(ge=0)
@@ -34,9 +34,9 @@ class Author(AuthorBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
 
     references: list["Reference"] = Relationship(
-        back_populates="authors", link_model=AuthorReferenceLink
+        back_populates="authors", link_model=ReferenceAuthorLink
     )
-    # reference_links: list[AuthorReferenceLink] = Relationship(back_populates="author")
+    # reference_links: list[ReferenceAuthorLink] = Relationship(back_populates="author")
 
 
 class AuthorCreate(AuthorBase): ...
@@ -71,9 +71,9 @@ class Reference(ReferenceBase, table=True):
     # proteins: "Protein | None" = Relationship(back_populates="primary_reference")
 
     authors: list[Author] = Relationship(
-        back_populates="references", link_model=AuthorReferenceLink
+        back_populates="references", link_model=ReferenceAuthorLink
     )
-    # author_links: list[AuthorReferenceLink] = Relationship(back_populates="reference")
+    # author_links: list[ReferenceAuthorLink] = Relationship(back_populates="reference")
 
 
 class ReferenceCreate(FPBaseModel):

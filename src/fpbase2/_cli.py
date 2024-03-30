@@ -42,13 +42,14 @@ def shell() -> None:
         "from fpbase2.models._manager import Manager",
         "from fpbase2.core.db import *",
         "from fpbase2.core.config import settings",
+        "from fpbase2.tests.utils.protein import *",
         "from _dev import *",
         "from _dev._import import *",
         "from fpbase2.utils import *",
         "from rich import print",
         "from rich import pretty; pretty.install()",
         "session = Session(engine)",
-        "init_db(session)",
+        # "init_db(session)",
         "Manager.set_session(session)",
     ]
 

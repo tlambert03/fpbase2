@@ -4,6 +4,8 @@ import unicodedata
 from collections.abc import Container, Sequence
 from typing import Any
 
+from sqlalchemy import Connection, text
+
 
 def slugify(value: Any, allow_unicode: bool = False) -> str:
     """Convert a `value` into a slug.
@@ -27,12 +29,27 @@ def slugify(value: Any, allow_unicode: bool = False) -> str:
 def new_id(
     k: int = 5,
     opts: Sequence[str] = "ABCDEFGHJKLMNOPQRSTUVWXYZ123456789",
-    existing: Container[str] = (),
 ) -> str:
     # in sqlite, this could be: `substr(hex(randomblob(3)), 1, 6)`
-    i = 0
-    while (i := i + 1) < 100:
-        _uuid = "".join(secrets.choice(opts) for _ in range(k))
-        if _uuid not in existing:
-            return _uuid
-    raise RuntimeError("Could not generate unique uuid.")  # pragma: no cover
+    return "".join(secrets.choice(opts) for _ in range(k))
+
+
+def new_unique_id(
+    conn: Connection | None = None, existing: Container[str] = (), tries: int = 1000
+) -> str:
+    if conn is None:
+        if not existing:
+            raise ValueError("Must provide existing uuids if no connection is given.")
+        for _ in range(tries):
+            if (_uuid := new_id()) not in existing:
+                return _uuid
+    else:
+        for _ in range(tries):
+            _uuid = new_id()
+            result = conn.execute(
+                text("SELECT 1 FROM protein WHERE uuid = :uuid"), {"uuid": _uuid}
+            )
+            if result.scalar() is None:
+                return _uuid
+
+    raise RuntimeError(f"Could not generate unique uuid after {tries} tries.")
