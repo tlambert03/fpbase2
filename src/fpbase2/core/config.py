@@ -90,7 +90,9 @@ class Settings(BaseSettings):
         return self
 
     # my stuff
-    ALLOW_QM: bool = False
+
+    # Whether database is read-only. If True, no changes will be made to the database.
+    READ_ONLY: bool = False
 
 
 settings = Settings()

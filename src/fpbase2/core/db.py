@@ -21,6 +21,11 @@ engine = create_engine(
     poolclass=StaticPool if settings.DB_SQLITE_PATH else None,
 )
 
+if settings.READ_ONLY:
+    from .utils import make_engine_read_only
+
+    make_engine_read_only(engine)
+
 
 def get_session() -> Iterator[Session]:
     """Yield a session to the caller, and close it when the caller is done.
