@@ -24,11 +24,11 @@ class FPBaseModel(SQLModel):
         name = cls.__name__.lower()
         if str(settings.SQLALCHEMY_DATABASE_URI).endswith("/fpbase"):
             prefix = {
-                'user': 'users_',
-                'reference': 'references_',
-                'author': 'references_',
-                'referenceauthorlink': 'references_',
-            }.get(name, 'proteins_')
+                "user": "users_",
+                "reference": "references_",
+                "author": "references_",
+                "referenceauthorlink": "references_",
+            }.get(name, "proteins_")
             name = f"{prefix}{name.removesuffix('link')}"
         return name
 
